@@ -1,0 +1,29 @@
+<div class="ce_hyperlink block">
+    <a href="<?= $this->create['href'] ?>"><img src="<?= $this->create['icon'] ?>" alt="<?= $this->create['label'] ?>"><span><?= $this->create['label'] ?></span></a>
+</div>
+<?php if (!empty($this->entities)): ?>
+<div class="ce_table block">
+    <table>
+        <tr>
+            <th><?= $this->titleHeadline ?></th>
+            <th>erstellt am</th>
+            <th>aktualisiert am</th>
+            <th>Status</th>
+            <th></th>
+        </tr>
+        <?php foreach ($this->entities as $arrEntity): ?>
+            <tr>
+                <td><?= nl2br($arrEntity['title']) ?></td>
+                <td><?= $arrEntity['created_at'] ?></td>
+                <td><?= $arrEntity['updated_at'] ?></td>
+                <td><span <?php if ($arrEntity['status']['color']): ?>style="color:<?= $arrEntity['status']['color'] ?>"<?php endif; ?>><?= $arrEntity['status']['name'] ?></span></td>
+                <td>
+                    <?php foreach ($arrEntity['buttons'] as $arrButton): ?>
+                        <a href="<?= $arrButton['href'] ?>"><img src="<?= $arrButton['icon'] ?>" alt="<?= $arrButton['label'] ?>"></a>
+                    <?php endforeach; ?>
+                </td>
+            </tr>
+        <?php endforeach; ?>
+    </table>
+</div>
+<?php endif; ?>

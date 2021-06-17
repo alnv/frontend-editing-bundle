@@ -1,0 +1,44 @@
+{
+  "name": "alnv/frontend-editing-bundle",
+  "type": "contao-bundle",
+  "license": "proprietary",
+  "description": "",
+  "authors": [
+    {
+      "name": "Alexander Naumov",
+      "homepage": "https://alexandernaumov.de",
+      "role": "Developer"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "Alnv\\FrontendEditingBundle\\": "src/"
+    },
+    "classmap": [
+      "src/Resources/contao/"
+    ],
+    "exclude-from-classmap": [
+      "src/Resources/contao/dca/",
+      "src/Resources/contao/config/",
+      "src/Resources/contao/languages/",
+      "src/Resources/contao/templates/"
+    ]
+  },
+  "require": {
+    "php":">=7.1",
+    "ext-json": "*",
+    "contao/core-bundle":"~4.4",
+    "menatwork/contao-multicolumnwizard-bundle": "^3.4"
+  },
+  "config": {
+    "preferred-install": "dist"
+  },
+  "extra": {
+    "contao": {
+      "sources": {
+        "": "system/modules/contao-frontend-editing-bundle"
+      }
+    },
+    "contao-manager-plugin": "Alnv\\FrontendEditingBundle\\ContaoManager\\Plugin"
+  }
+}

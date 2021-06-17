@@ -1,0 +1,9 @@
+<?php $this->extend('block_unsearchable'); ?>
+<?php $this->block('content'); ?>
+<?php if ($this->formTpl): ?>
+    <?= $this->formTpl ?>
+<?php endif;?>
+<?php if ($this->listTpl): ?>
+    <?= $this->listTpl ?>
+<?php endif;?>
+<?php $this->endblock(); ?>

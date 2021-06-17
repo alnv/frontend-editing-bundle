@@ -1,0 +1,18 @@
+<form method="POST" novalidate>
+    <div class="formbody">
+        <input type="hidden" name="FORM_SUBMIT" value="<?= $this->submitId ?>">
+        <input type="hidden" name="REQUEST_TOKEN" value="{{request_token}}">
+        <?php foreach ($this->fields as $strName => $strField): ?>
+            <?= $strField ?>
+        <?php endforeach; ?>
+        <?php if (!empty($this->buttons)): ?>
+        <div class="submit_container">
+            <?php foreach ($this->buttons as $strId => $strLabel): ?>
+                <div class="widget widget-submit">
+                    <button type="submit" name="<?= $strId ?>" id="id_<?= $strId ?>" value="<?= $this->submitId ?>" class="tl_submit type_<?= $strId ?>"><?= $strLabel ?></button>
+                </div>
+            <?php endforeach; ?>
+        </div>
+        <?php endif; ?>
+    </div>
+</form>

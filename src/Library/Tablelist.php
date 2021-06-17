@@ -1,0 +1,105 @@
+<?php
+
+namespace Alnv\FrontendEditingBundle\Library;
+
+class Tablelist {
+
+    public function getEntities($arrSettings) {
+
+        $arrReturn = [];
+        $arrQueryValues = [];
+        $arrQueryColumns = [];
+
+        if ($arrSettings['saveMemberId']) {
+            $arrQueryColumns[] = 'member=?';
+            $arrQueryValues[] = \FrontendUser::getInstance()->id;
+        }
+
+        $objEntities = \Database::getInstance()->prepare('SELECT * FROM tl_entity'.(empty($arrQueryColumns) ? '' :' WHERE ' . implode(' AND ', $arrQueryColumns)))->execute($arrQueryValues);
+
+        if (!$objEntities->numRows) {
+            return $arrReturn;
+        }
+
+        while ($objEntities->next()) {
+
+            $arrSet = $objEntities->row();
+            $arrValues = $this->getValues($objEntities->id);
+
+            if (empty($arrValues)) {
+                continue;
+            }
+
+            $arrSet['status'] = (new \Alnv\FrontendEditingBundle\Library\DataContainer())->getStatus($arrSet['status']);
+            $arrSet['title'] = \StringUtil::parseSimpleTokens($arrSettings['titleColumn'], $this->getFormTokens($arrValues));
+            $arrSet['values'] = $arrValues;
+            $arrSet['buttons'] = $this->getButtons($arrSet);
+            $arrSet['updated_at'] = (new \Date($arrSet['stamp']))->datim;
+            $arrSet['created_at'] = (new \Date($arrSet['created_at']))->datim;
+
+            $arrReturn[] = $arrSet;
+        }
+
+        return $arrReturn;
+    }
+
+    protected function getFormTokens($arrValues) {
+
+        $arrReturn = [];
+        foreach ($arrValues as $strField => $arrField) {
+            $arrReturn['form_' . $strField] = $arrField['value'];
+        }
+        return $arrReturn;
+    }
+
+    public function getCreateButton() {
+
+        global $objPage;
+
+        return [
+            'href' => $objPage->getFrontendUrl('/'.md5(time().uniqid())),
+            'icon' => 'system/themes/flexible/icons/new.svg',
+            'label' => $GLOBALS['TL_LANG']['MSC']['createButton']
+        ];
+    }
+
+    protected function getButtons($arrEntity) {
+
+        global $objPage;
+
+        $arrReturn = [];
+
+        $arrReturn['edit'] = [
+            'href' => $objPage->getFrontendUrl('/'.$arrEntity['alias']),
+            'icon' => 'system/themes/flexible/icons/edit.svg',
+            'label' => $GLOBALS['TL_LANG']['MSC']['editButton']
+        ];
+
+        $arrReturn['delete'] = [
+            'href' => $objPage->getFrontendUrl('/delete') . '?id='.$arrEntity['id'],
+            'icon' => 'system/themes/flexible/icons/delete.svg',
+            'label' => $GLOBALS['TL_LANG']['MSC']['deleteButton']
+        ];
+
+        return $arrReturn;
+    }
+
+    public function getValues($strEntityId) {
+
+        $arrValues = [];
+        $objValues = \Database::getInstance()->prepare('SELECT * FROM tl_entity_value WHERE pid=?')->execute($strEntityId);
+        while ($objValues->next()) {
+
+            $objField = \FormFieldModel::findByPk($objValues->field);
+            if (!$objField) {
+                continue;
+            }
+
+            $arrSet = $objField->row();
+            $arrSet['value'] = $objValues->varValue;
+            $arrValues[$objField->name] = $arrSet;
+        }
+
+        return $arrValues;
+    }
+}
