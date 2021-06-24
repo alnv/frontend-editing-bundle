@@ -52,14 +52,18 @@ class Tablelist {
         return $arrReturn;
     }
 
-    public function getCreateButton() {
+    public function getCreateButton($strAlias='') {
 
         global $objPage;
 
+        if (!$strAlias) {
+            $strAlias = md5(time().uniqid());
+        }
+
         return [
-            'href' => $objPage->getFrontendUrl('/'.md5(time().uniqid())),
             'icon' => 'system/themes/flexible/icons/new.svg',
-            'label' => $GLOBALS['TL_LANG']['MSC']['createButton']
+            'label' => $GLOBALS['TL_LANG']['MSC']['createButton'],
+            'href' => $objPage->getFrontendUrl('/'.$strAlias) . '?form=' . \Input::get('form')
         ];
     }
 

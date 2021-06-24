@@ -1,9 +1,19 @@
 <?php
 
 $GLOBALS['TL_DCA']['tl_content']['palettes']['__selector__'][] = 'addMemberPermissions';
-$GLOBALS['TL_DCA']['tl_content']['palettes']['frontend_editing'] = '{type_legend},type,headline;{include_legend},form;{editing_legend},addMemberPermissions,disableList,submitButtons,startStatus,titleHeadlineColumn,titleColumn;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},cssID;{invisible_legend:hide},invisible,start,stop';
+$GLOBALS['TL_DCA']['tl_content']['palettes']['frontend_editing'] = '{type_legend},type,headline;{include_legend},forms;{editing_legend},addMemberPermissions,disableList,submitButtons,startStatus,titleHeadlineColumn,titleColumn;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},cssID;{invisible_legend:hide},invisible,start,stop';
 $GLOBALS['TL_DCA']['tl_content']['subpalettes']['addMemberPermissions']  = 'addMemberId';
 
+$GLOBALS['TL_DCA']['tl_content']['fields']['forms'] = [
+    'inputType' => 'checkboxWizard',
+    'eval' => [
+        'mandatory' => true,
+        'tl_class' => 'clr',
+        'multiple' => true
+    ],
+    'options_callback' => ['tl_content', 'getForms'],
+    'sql' => "blob NULL"
+];
 $GLOBALS['TL_DCA']['tl_content']['fields']['addMemberPermissions'] = [
     'inputType' => 'checkbox',
     'eval' => [

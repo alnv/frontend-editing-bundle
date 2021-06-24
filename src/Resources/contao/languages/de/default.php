@@ -7,3 +7,4 @@ $GLOBALS['TL_LANG']['MSC']['submitSaveNcreate'] = 'Speichern und neu';
 $GLOBALS['TL_LANG']['MSC']['editButton'] = 'Bearbeiten';
 $GLOBALS['TL_LANG']['MSC']['createButton'] = 'Neu';
 $GLOBALS['TL_LANG']['MSC']['deleteButton'] = 'Löschen';
+$GLOBALS['TL_LANG']['MSC']['formSelectBlankOption'] = 'Formular auswählen';

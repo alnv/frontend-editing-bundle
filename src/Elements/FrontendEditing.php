@@ -10,9 +10,11 @@ class FrontendEditing extends  \ContentElement {
         'submitButtons' => []
     ];
 
+    protected $arrForms = [];
     protected $strAlias = null;
     protected $arrSubmitted = [];
     protected $strSubmitType = null;
+    protected $strActiveForm = null;
     protected $strTemplate = 'ce_frontend_editing';
 
     public function generate() {
@@ -30,9 +32,21 @@ class FrontendEditing extends  \ContentElement {
             throw new \CoreBundle\Exception\AccessDeniedException('Page access denied: ' . \Environment::get('uri'));
         }
 
+        $this->setAlias();
+        $this->setForms();
         $this->deleteAndReload();
+        $this->strActiveForm = $this->getFormId();
 
         return parent::generate();
+    }
+
+    protected function setAlias() {
+
+        if ($_GET['auto_item']) {
+            $this->strAlias = \Input::get('auto_item');
+        } else {
+            $this->strAlias = md5(time().uniqid());
+        }
     }
 
     protected function deleteAndReload() {
@@ -60,7 +74,6 @@ class FrontendEditing extends  \ContentElement {
         }
 
         \Database::getInstance()->prepare('DELETE FROM tl_entity WHERE id=?')->limit(1)->execute($objEntity->id);
-
         \Controller::redirect($objPage->getFrontendUrl());
     }
 
@@ -73,13 +86,55 @@ class FrontendEditing extends  \ContentElement {
         }
     }
 
+    protected function setForms() {
+
+        $arrForms = [];
+        $arrFormsId = \StringUtil::deserialize($this->forms, true);
+        foreach ($arrFormsId as $strFormId) {
+            $objForm = \FormModel::findByPk($strFormId);
+            if (!$objForm) {
+                continue;
+            }
+            $arrForms[$objForm->id] = $objForm->row();
+        }
+
+        $this->arrForms = $arrForms;
+    }
+
+    protected function getFormId() {
+
+        if ($_GET['auto_item']) {
+            $arrEntity = (new \Alnv\FrontendEditingBundle\Library\Form())->getEntityByAlias($this->strAlias);
+            if (!empty($arrEntity)) {
+                $objGroup = \Database::getInstance()->prepare('SELECT * FROM tl_entity_group WHERE id=?')->limit(1)->execute($arrEntity['pid']);
+                return $objGroup->form;
+            }
+        }
+
+        $strFormId = \Input::get('form');
+        if ($strFormId && in_array($strFormId, array_keys($this->arrForms))) {
+            return $strFormId;
+        }
+
+        if (!empty($this->arrForms) && count($this->arrForms) < 2) {
+            $arrForms = array_keys($this->arrForms);
+            return $arrForms[0] ?: null;
+        }
+
+        return null;
+    }
+
     protected function generateList() {
 
         $strTemplate = 'fre_tablelist';
         $objTemplate = new \FrontendTemplate($strTemplate);
+        
         $objTemplate->setData([
+            'id' => $this->id,
+            'forms' => $this->arrForms,
+            'activeForm' => \Input::get('form') ?: '',
             'titleHeadline' => $this->arrSettings['titleHeadlineColumn'],
-            'create' => (new \Alnv\FrontendEditingBundle\Library\Tablelist())->getCreateButton(),
+            'create' => (new \Alnv\FrontendEditingBundle\Library\Tablelist())->getCreateButton($this->strAlias),
             'entities' => (new \Alnv\FrontendEditingBundle\Library\Tablelist())->getEntities($this->arrSettings)
         ]);
         $this->Template->listTpl = $objTemplate->parse();
@@ -89,9 +144,8 @@ class FrontendEditing extends  \ContentElement {
 
         $blnSubmit = false;
         $strTemplate = 'fre_form';
-        $this->strAlias = \Input::get('auto_item') ?: md5(time().uniqid());
-        $arrFields = (new \Alnv\FrontendEditingBundle\Library\Form())->getFormFieldsByFormId($this->form, $this->strAlias);
         $arrEntity = (new \Alnv\FrontendEditingBundle\Library\Form())->getEntityByAlias($this->strAlias);
+        $arrFields = (new \Alnv\FrontendEditingBundle\Library\Form())->getFormFieldsByFormId($this->strActiveForm, $this->strAlias);
 
         $arrTemplateData = [
             'submitId' => $this->getSubmitId(),
@@ -142,8 +196,8 @@ class FrontendEditing extends  \ContentElement {
 
     protected function save() {
 
-        $arrEntity = (new \Alnv\FrontendEditingBundle\Library\Form())->createEntityByAliasAndFormId($this->strAlias, $this->form, $this->getMemberId());
-        $arrFields = (new \Alnv\FrontendEditingBundle\Library\Form())->getRawFormFieldsByFormId($this->form);
+        $arrEntity = (new \Alnv\FrontendEditingBundle\Library\Form())->createEntityByAliasAndFormId($this->strAlias, $this->strActiveForm, $this->getMemberId());
+        $arrFields = (new \Alnv\FrontendEditingBundle\Library\Form())->getRawFormFieldsByFormId($this->strActiveForm);
 
         foreach ($this->arrSubmitted as $strName => $varValue) {
             $objField = $arrFields[$strName];

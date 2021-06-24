@@ -1,5 +1,6 @@
 <?php
 
+$GLOBALS['TL_LANG']['tl_content']['forms'] = ['Formulare', ''];
 $GLOBALS['TL_LANG']['tl_content']['editing_legend'] = 'Frontend-Editing Einstellungen';
 $GLOBALS['TL_LANG']['tl_content']['addMemberPermissions'] = ['Mitglieder-Berechtigungen verwenden', ''];
 $GLOBALS['TL_LANG']['tl_content']['addMemberId'] = ['Mitglieder-ID speichern', ''];

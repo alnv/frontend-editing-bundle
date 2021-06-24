@@ -1,6 +1,25 @@
-<div class="ce_hyperlink block">
-    <a href="<?= $this->create['href'] ?>"><img src="<?= $this->create['icon'] ?>" alt="<?= $this->create['label'] ?>"><span><?= $this->create['label'] ?></span></a>
-</div>
+<?php if (count($this->forms) > 1): ?>
+    <form method="GET">
+        <div class="widget widget-select">
+            <label for="form-<?= $this->id ?>"></label>
+            <select id="form-<?= $this->id ?>" name="form" onchange="this.form.submit()">
+                <option value=""><?= $GLOBALS['TL_LANG']['MSC']['formSelectBlankOption'] ?></option>
+                <?php foreach ($this->forms as $arrForm): ?>
+                    <option value="<?= $arrForm['id'] ?>"<?= ($this->activeForm == $arrForm['id']?' selected':'') ?>><?= $arrForm['title'] ?></option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+    </form>
+    <?php if ($this->activeForm): ?>
+        <div class="ce_hyperlink block">
+            <a href="<?= $this->create['href'] ?>"><img src="<?= $this->create['icon'] ?>" alt="<?= $this->create['label'] ?>"><span><?= $this->create['label'] ?></span></a>
+        </div>
+    <?php endif; ?>
+<?php else: ?>
+    <div class="ce_hyperlink block">
+        <a href="<?= $this->create['href'] ?>"><img src="<?= $this->create['icon'] ?>" alt="<?= $this->create['label'] ?>"><span><?= $this->create['label'] ?></span></a>
+    </div>
+<?php endif; ?>
 <?php if (!empty($this->entities)): ?>
 <div class="ce_table block">
     <table>
