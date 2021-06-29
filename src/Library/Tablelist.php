@@ -52,12 +52,17 @@ class Tablelist {
         return $arrReturn;
     }
 
+    protected function getAlias() {
+
+        return md5(time().uniqid());
+    }
+
     public function getCreateButton($strAlias='') {
 
         global $objPage;
 
         if (!$strAlias) {
-            $strAlias = md5(time().uniqid());
+            $strAlias = $this->getAlias();
         }
 
         return [
@@ -79,6 +84,12 @@ class Tablelist {
             'label' => $GLOBALS['TL_LANG']['MSC']['editButton']
         ];
 
+        $arrReturn['copy'] = [
+            'href' => $objPage->getFrontendUrl('/'.$this->getAlias()).'?copy='.$arrEntity['id'].'&form='.$this->getFormIdByEntityPid($arrEntity['pid']),
+            'icon' => 'system/themes/flexible/icons/copy.svg',
+            'label' => $GLOBALS['TL_LANG']['MSC']['copyButton']
+        ];
+
         $arrReturn['delete'] = [
             'href' => $objPage->getFrontendUrl('/delete') . '?id='.$arrEntity['id'],
             'icon' => 'system/themes/flexible/icons/delete.svg',
@@ -86,6 +97,12 @@ class Tablelist {
         ];
 
         return $arrReturn;
+    }
+
+    protected function getFormIdByEntityPid($strPid) {
+
+        $objForm = \Database::getInstance()->prepare('SELECT * FROM tl_form WHERE id=(SELECT form FROM tl_entity_group WHERE id=? LIMIT 1)')->limit(1)->execute($strPid);
+        return $objForm->id ?: '';
     }
 
     public function getValues($strEntityId) {

@@ -60,6 +60,8 @@ class Form {
                 } else {
                     if ($arrEntity) {
                         $arrData['value'] = $this->getValue($objField->id, $arrEntity['id'], $objField);
+                    } elseif (\Input::get('copy')) {
+                        $arrData['value'] = $this->getValue($objField->id, \Input::get('copy'), $objField);
                     }
                 }
 
@@ -144,7 +146,7 @@ class Form {
         return $strValue;
     }
 
-    public function createEntityByAliasAndFormId($strAlias, $strFormId, $blnMember=null) {
+    public function createEntityByAliasAndFormId($strAlias, $strFormId, $strMember=null) {
 
         $strGroupId = null;
         $objEntityGroup = \Database::getInstance()->prepare('SELECT * FROM tl_entity_group WHERE form=?')->limit(1)->execute($strFormId);
@@ -167,7 +169,7 @@ class Form {
                 'pid' => $strGroupId,
                 'created_at' => time(),
                 'alias' => md5(time() . uniqid()),
-                'member' => ($blnMember?null:\FrontendUser::getInstance()->id)
+                'member' => $strMember ?: null
             ];
             $objInsert = \Database::getInstance()->prepare('INSERT INTO tl_entity %s')->set($arrSet)->execute();
             $arrSet['id'] = $objInsert->insertId;
