@@ -24,6 +24,14 @@ $GLOBALS['TL_DCA']['tl_entity'] = [
                     $strValue = \StringUtil::deserialize($arrField['value']);
                     if (is_array($strValue)) {
                         $strValue = $strValue = json_encode($strValue);
+                        $strValue = str_replace('"', '', $strValue);
+                        $strValue = str_replace('[', '', $strValue);
+                        $strValue = str_replace(']', '', $strValue);
+                        $strValue = str_replace('{', '', $strValue);
+                        $strValue = str_replace('}', '', $strValue);
+                        $strValue = str_replace('"', '', $strValue);
+                        $strValue = str_replace(',', ' | ', $strValue);
+                        $strValue = str_replace(':', ': ', $strValue);
                     }
                     $strTemplate .= ($arrField['label']?$arrField['label']:$arrField['name']) .': ' . $strValue . '</br>';
                 }

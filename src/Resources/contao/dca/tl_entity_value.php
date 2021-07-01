@@ -37,6 +37,14 @@ $GLOBALS['TL_DCA']['tl_entity_value'] = [
                             $strValue = \StringUtil::deserialize($strValue);
                             if (is_array($strValue)) {
                                 $strValue = json_encode($strValue);
+                                $strValue = str_replace('"', '', $strValue);
+                                $strValue = str_replace('[', '', $strValue);
+                                $strValue = str_replace(']', '', $strValue);
+                                $strValue = str_replace('{', '', $strValue);
+                                $strValue = str_replace('}', '', $strValue);
+                                $strValue = str_replace('"', '', $strValue);
+                                $strValue = str_replace(',', ' | ', $strValue);
+                                $strValue = str_replace(':', ': ', $strValue);
                             }
                             break;
                     }
