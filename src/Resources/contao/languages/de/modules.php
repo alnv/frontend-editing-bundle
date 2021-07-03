@@ -1,6 +1,7 @@
 <?php
 
 $GLOBALS['TL_LANG']['MOD']['frontend-editing-bundle'] = 'Frontend-Editing';
+$GLOBALS['TL_LANG']['FFL']['dropzone'] = ['Dropzone Upload', ''];
 $GLOBALS['TL_LANG']['MOD']['entities'] = ['Formulardaten', ''];
 $GLOBALS['TL_LANG']['MOD']['states'] = ['Status', ''];
 

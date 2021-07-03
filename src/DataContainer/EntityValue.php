@@ -13,7 +13,12 @@ class EntityValue {
             return null;
         }
 
+        if ($objField->type == 'dropzone') {
+            $objField->type = 'fileTree';
+        }
+
         $strClass = $GLOBALS['BE_FFL'][$objField->type];
+
         if (!class_exists($strClass)) {
             $GLOBALS['TL_DCA']['tl_entity_value']['fields']['varValue']['inputType'] = 'multiColumnWizard';
             $GLOBALS['TL_DCA']['tl_entity_value']['fields']['varValue']['eval']['columnFields'] = [];
@@ -33,13 +38,23 @@ class EntityValue {
         $GLOBALS['TL_DCA']['tl_entity_value']['fields']['varValue']['inputType'] = $objField->type;
         $GLOBALS['TL_DCA']['tl_entity_value']['fields']['varValue']['eval']['tl_class'] = 'w50';
 
-        if (in_array( $objField->type, ['select', 'checkbox', 'radio'])) {
+        if (in_array($objField->type, ['select', 'checkbox', 'radio'])) {
             $arrOptions = [];
             $GLOBALS['TL_DCA']['tl_entity_value']['fields']['varValue']['eval']['includeBlankOption'] = true;
             foreach (\StringUtil::deserialize($objField->options, true) as $arrOption) {
                 $arrOptions[$arrOption['value']] = $arrOption['label'];
             }
             $GLOBALS['TL_DCA']['tl_entity_value']['fields']['varValue']['options'] = $arrOptions;
+        }
+
+        if ($objField->type == 'fileTree') {
+            $GLOBALS['TL_DCA']['tl_entity_value']['fields']['varValue']['eval'] = [
+                'files' => true,
+                'tl_class' => 'clr',
+                'multiple' => $objField->multiple ? true : false,
+                'mandatory' => $objField->mandatory ? true : false,
+                'fieldType' => $objField->multiple ? 'checkbox' : 'radio'
+            ];
         }
     }
 }

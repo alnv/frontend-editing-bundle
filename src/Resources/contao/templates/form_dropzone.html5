@@ -1,0 +1,193 @@
+<?php $this->extend('form_row'); ?>
+<?php $this->block('label'); ?>
+<?php if ($this->label): ?>
+    <label for="ctrl_<?= $this->id ?>"<?php if ($this->class): ?> class="<?= $this->class ?>"<?php endif; ?>>
+        <?php if ($this->mandatory): ?>
+            <span class="invisible"><?= $this->mandatoryField ?> </span><?= $this->label ?><span class="mandatory">*</span>
+        <?php else: ?>
+            <?= $this->label ?>
+        <?php endif; ?>
+    </label>
+<?php endif; ?>
+<?php $this->endblock(); ?>
+<?php $this->block('field'); ?>
+<?php
+    $arrFiles = \Alnv\FrontendEditingBundle\Library\Helpers::getDropzoneValue($this->value);
+    $objCombiner = new \Combiner();
+    $objCombiner->add('bundles/alnvfrontendediting/dropzone/basic.min.css');
+    $objCombiner->add('bundles/alnvfrontendediting/dropzone/dropzone.min.css');
+    $GLOBALS['TL_CSS']['cssDropzone'] = $objCombiner->getCombinedFile();
+    $GLOBALS['TL_HEAD']['jDropzone'] = '<script src="/bundles/alnvfrontendediting/dropzone/dropzone.min.js"></script>';
+?>
+<div class="dropzone-files">
+    <?php if (!empty($arrFiles)): ?>
+        <table id="id_list_<?= $this->id ?>">
+            <tr>
+                <th><?= $GLOBALS['TL_LANG']['MSC']['uploadNameColumn'] ?></th>
+                <th></th>
+            </tr>
+            <?php foreach ($arrFiles as $strUud): ?>
+                <?php
+                $objFileModel = \FilesModel::findByUuid($strUud);
+                if (!$objFileModel) {
+                    continue;
+                }
+                ?>
+                <?php if ($objFile = new \File($objFileModel->path)): ?>
+                    <tr data-uuid="<?= \StringUtil::binToUuid($objFileModel->uuid) ?>">
+                        <td><div class="ce_download block"><p class="download-element ext-<?= $objFileModel->extension ?>"><?= $objFileModel->name ?> <span class="size">(<?= \Controller::getReadableSize($objFile->filesize) ?>)</span></p></div></td>
+                        <td><button type="button" class="button delete"><img src="/system/themes/flexible/icons/delete.svg" alt=""></button></td>
+                    </tr>
+                <?php endif; ?>
+            <?php endforeach; ?>
+        </table>
+    <?php endif; ?>
+</div>
+<div class="dropzone-field">
+    <input type="hidden" value="" name="<?= $this->name ?>" id="id_input_<?= $this->id ?>">
+    <div id="id_dropzone_<?= $this->id ?>" class="dropzone">
+        <div class="dz-message"><?= $GLOBALS["TL_LANG"]["MSC"]["dropzoneDzMessage"] ?></div>
+    </div>
+    <p id="id_error_<?= $this->id ?>" class="<?= ($this->hasErrors()?'error':'') ?>"><?= ($this->hasErrors()?$this->getErrorAsString():'') ?></p>
+</div>
+<script async defer>
+    (function (){
+        Dropzone.autoDiscover = false;
+        Dropzone.prototype.defaultOptions.dictDefaultMessage = '<?= $GLOBALS["TL_LANG"]["MSC"]["dictDefaultMessage"] ?>';
+        Dropzone.prototype.defaultOptions.dictFallbackMessage = '<?= $GLOBALS["TL_LANG"]["MSC"]["dictFallbackMessage"] ?>';
+        Dropzone.prototype.defaultOptions.dictFallbackText ='<?= $GLOBALS["TL_LANG"]["MSC"]["dictFallbackText"] ?>';
+        Dropzone.prototype.defaultOptions.dictFileTooBig = '<?= $GLOBALS["TL_LANG"]["MSC"]["dictFileTooBig"] ?>';
+        Dropzone.prototype.defaultOptions.dictInvalidFileType = '<?= $GLOBALS["TL_LANG"]["MSC"]["dictInvalidFileType"] ?>';
+        Dropzone.prototype.defaultOptions.dictResponseError = '<?= $GLOBALS["TL_LANG"]["MSC"]["dictResponseError"] ?>';
+        Dropzone.prototype.defaultOptions.dictCancelUpload = '<?= $GLOBALS["TL_LANG"]["MSC"]["dictCancelUpload"] ?>';
+        Dropzone.prototype.defaultOptions.dictCancelUploadConfirmation = '<?= $GLOBALS["TL_LANG"]["MSC"]["dictCancelUploadConfirmation"] ?>';
+        Dropzone.prototype.defaultOptions.dictRemoveFile = '<?= $GLOBALS["TL_LANG"]["MSC"]["dictRemoveFile"] ?>';
+        Dropzone.prototype.defaultOptions.dictMaxFilesExceeded = '<?= $GLOBALS["TL_LANG"]["MSC"]["dictMaxFilesExceeded"] ?>';
+        let objDropzone = setUpDropzone();
+        function setUpDropzone() {
+            clearUpload();
+            let objDropzoneOptions = {
+                url: '/_dropzone/upload/<?= $this->id ?>',
+                paramName: '<?= $this->name ?>',
+                parallelUploads: 1,
+                maxFilesize: <?= ($this->maxlength?$this->maxlength:256) ?>,
+                maxFiles: <?= !$this->multiple?1:$this->mSize ?>,
+                timeout: 0,
+                addRemoveLinks: true,
+                params: {
+                    uploads: <?= json_encode($arrFiles) ?>
+                }
+            };
+            let objDropzone = new Dropzone(document.getElementById('id_dropzone_<?= $this->id ?>'), objDropzoneOptions);
+            objDropzone.on('complete', function (file) {
+                setError('');
+                let objResponse = JSON.parse(file.xhr.response);
+                if (!objResponse.success) {
+                    setError((objResponse.error?objResponse.error:objResponse.message))
+                } else {
+                    if (objResponse.file.uuid) {
+                        try {
+                            setUpload(objResponse.file.uuid);
+                        } catch (error) {
+                            clearUpload();
+                            objDropzone.removeFile(file);
+                            setError('<?= $GLOBALS['TL_LANG']['MSC']['uploadMessageTryAgain'] ?>');
+                        }
+                    }
+                }
+            });
+            objDropzone.on('removedfile', function (file) {
+                let objResponse = JSON.parse(file.xhr.response);
+                let objXHttp = new XMLHttpRequest();
+                objXHttp.open('POST', '/_dropzone/remove/'+objResponse.file.uuid, true);
+                objXHttp.send();
+                removeUpload(objResponse.file.uuid)
+
+            });
+            let arrDeleteFiles = document.querySelectorAll("#id_list_<?= $this->id ?> button");
+            for (let i=0;i<arrDeleteFiles.length;i++) {
+                let objButton = arrDeleteFiles[i];
+                if (!objButton) {
+                    continue;
+                }
+                objButton.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    let node = getUuidNodeFromButton(this)
+                    if (node.dataset.uuid && typeof node.dataset.uuid !== 'undefined') {
+                        removeUpload(node.dataset.uuid);
+                        node.remove();
+                    }
+                });
+            }
+            return objDropzone;
+        }
+        function getUuidNodeFromButton(node) {
+            if (node.dataset.uuid) {
+                return node;
+            }
+            return getUuidNodeFromButton(node.parentNode);
+        }
+        function removeUpload(uuid) {
+            let objInput = document.querySelector('#id_input_<?= $this->id ?>');
+            if (!objInput) {
+                return null;
+            }
+            let values = objInput.value ? JSON.parse(objInput.value) : [];
+            const index = values.indexOf(uuid);
+            if (index > -1) {
+                values.splice(index, 1);
+            }
+            objInput.value = JSON.stringify(values);
+        }
+        function setUpload(uuid) {
+            let objInput = document.querySelector('#id_input_<?= $this->id ?>');
+            if (!objInput) {
+                return null;
+            }
+            let blnSet = false;
+            let multiple = <?= ($this->multiple?'true':'false') ?>;
+            let values = objInput.value ? JSON.parse(objInput.value) : [];
+
+            if (values.indexOf(uuid) > 0) {
+                return null;
+            }
+
+            if (multiple && values.length<<?= $this->mSize ?>) {
+                values.push(uuid);
+                blnSet = true;
+            }
+
+            if (!multiple) {
+                values = [uuid];
+                blnSet = true;
+            }
+
+            objInput.value = JSON.stringify(values);
+            if (!blnSet) {
+                setError('<?= $GLOBALS['TL_LANG']['MSC']['uploadLimit']  ?>');
+            }
+        }
+        function clearUpload() {
+            let objInput = document.querySelector('#id_input_<?= $this->id ?>');
+            if (!objInput) {
+                return null;
+            }
+            objInput.value = JSON.stringify(<?= json_encode($arrFiles) ?>);
+        }
+        function setError(message) {
+            let objError = document.querySelector('#id_error_<?= $this->id ?>');
+            if (!objError) {
+                return null;
+            }
+            if (!message) {
+                objError.classList.remove('error');
+                objError.innerHTML = '';
+                return null;
+            }
+            objError.innerHTML = message;
+            objError.classList.add('error');
+        }
+    })()
+</script>
+
+<?php $this->endblock(); ?>

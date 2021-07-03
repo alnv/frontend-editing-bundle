@@ -23,15 +23,7 @@ $GLOBALS['TL_DCA']['tl_entity'] = [
                 foreach ((new \Alnv\FrontendEditingBundle\Library\Tablelist())->getValues($arrRow['id']) as $arrField) {
                     $strValue = \StringUtil::deserialize($arrField['value']);
                     if (is_array($strValue)) {
-                        $strValue = $strValue = json_encode($strValue);
-                        $strValue = str_replace('"', '', $strValue);
-                        $strValue = str_replace('[', '', $strValue);
-                        $strValue = str_replace(']', '', $strValue);
-                        $strValue = str_replace('{', '', $strValue);
-                        $strValue = str_replace('}', '', $strValue);
-                        $strValue = str_replace('"', '', $strValue);
-                        $strValue = str_replace(',', ' | ', $strValue);
-                        $strValue = str_replace(':', ': ', $strValue);
+                        $strValue = \Alnv\FrontendEditingBundle\Library\Helpers::makeArrayReadable($strValue);
                     }
                     $strTemplate .= ($arrField['label']?$arrField['label']:$arrField['name']) .': ' . $strValue . '</br>';
                 }

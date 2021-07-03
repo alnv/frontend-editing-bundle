@@ -1,0 +1,3 @@
+upload:
+  resource: "@AlnvFrontendEditingBundle/Controller"
+  type: annotation
