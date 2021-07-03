@@ -142,7 +142,7 @@ class FrontendEditing extends  \ContentElement {
 
     protected function generateForm() {
 
-        $blnSubmit = false;
+        $blnSubmit = $this->isSubmitted();
         $strTemplate = 'fre_form';
         $arrEntity = (new \Alnv\FrontendEditingBundle\Library\Form())->getEntityByAlias($this->strAlias);
         $arrFields = (new \Alnv\FrontendEditingBundle\Library\Form())->getFormFieldsByFormId($this->strActiveForm, $this->strAlias);
@@ -156,8 +156,7 @@ class FrontendEditing extends  \ContentElement {
         $objTemplate = new \FrontendTemplate($strTemplate);
 
         foreach ($arrFields as $strField => $objWidget) {
-            if ($this->isSubmitted()) {
-                $blnSubmit = true;
+            if ($blnSubmit) {
                 $objWidget->validate();
                 if ($objWidget->hasErrors()) {
                     $blnSubmit = false;
