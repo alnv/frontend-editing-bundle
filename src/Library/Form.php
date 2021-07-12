@@ -184,8 +184,8 @@ class Form {
         return $objEntity->row();
     }
 
-    public function setStatus($strStatusID, $strEntityId, $arrSubmits) {
+    public function setStatus($strStatusID, $strEntityId) {
 
-        (new \Alnv\FrontendEditingBundle\Library\States())->changeState($strEntityId, $strStatusID, $arrSubmits);
+        (new \Alnv\FrontendEditingBundle\Library\States())->changeState($strEntityId, $strStatusID);
     }
 }

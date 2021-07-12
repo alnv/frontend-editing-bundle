@@ -103,6 +103,14 @@ $GLOBALS['TL_DCA']['tl_entity'] = [
                 'type' => 'hasOne',
                 'load' => 'lazy'
             ],
+            'save_callback' => [
+                function ($strStatusId, \DataContainer $dataContainer) {
+                    if ($strStatusId && $dataContainer->activeRecord->status !== $strStatusId) {
+                        (new \Alnv\FrontendEditingBundle\Library\States())->changeState($dataContainer->activeRecord->id, $dataContainer->activeRecord->status);
+                    }
+                    return $strStatusId;
+                }
+            ],
             'foreignKey' => 'tl_states.name',
             'sql' => ['type' => 'integer', 'notnull' => false, 'unsigned' => true]
         ]

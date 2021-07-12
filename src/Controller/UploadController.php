@@ -52,7 +52,7 @@ class UploadController extends Controller {
         } else {
             $this->clearUploads($objField);
             $arrResponse['success'] = true;
-            $arrResponse['file'] = $this->getUpload();
+            $arrResponse['file'] = $this->getUpload($objField->name);
         }
 
         return new JsonResponse($arrResponse);
@@ -95,10 +95,10 @@ class UploadController extends Controller {
         return ($varUploads?$varUploads:[]);
     }
 
-    protected function getUpload() {
+    protected function getUpload($strName) {
 
-        $arrUpload = $_SESSION['FILES']['upload'];
-        $objFile = \FilesModel::findByUuid($_SESSION['FILES']['upload']['uuid']);
+        $arrUpload = $_SESSION['FILES'][$strName];
+        $objFile = \FilesModel::findByUuid($_SESSION['FILES'][$strName]['uuid']);
         if ($objFile) {
             $arrUpload['path'] = $objFile->path;
         }

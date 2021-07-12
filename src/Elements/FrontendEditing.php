@@ -212,11 +212,11 @@ class FrontendEditing extends \ContentElement {
         }
 
         if (!$arrEntity['status']) {
-            (new \Alnv\FrontendEditingBundle\Library\Form())->setStatus($this->arrSettings['status'], $arrEntity['id'], $this->arrSubmitted);
+            (new \Alnv\FrontendEditingBundle\Library\Form())->setStatus($this->arrSettings['status'], $arrEntity['id']);
         }
 
         if ($arrEntity['status'] && $this->arrSettings['status'] != $this->startStatus) {
-            (new \Alnv\FrontendEditingBundle\Library\Form())->setStatus($this->arrSettings['status'], $arrEntity['id'], $this->arrSubmitted);
+            (new \Alnv\FrontendEditingBundle\Library\Form())->setStatus($this->arrSettings['status'], $arrEntity['id']);
         }
 
         return $arrEntity['alias'];

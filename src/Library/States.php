@@ -4,7 +4,7 @@ namespace Alnv\FrontendEditingBundle\Library;
 
 class States {
 
-    public function changeState($strEntityId, $strStateId, $arrSubmits) {
+    public function changeState($strEntityId, $strStateId) {
 
         if (!$strStateId) {
             return null;
@@ -22,18 +22,68 @@ class States {
                 'admin_email' => \Config::get('adminEmail')
             ];
 
-            foreach ($arrTokens as $strField => $varValue) {
-                $arrTokens['form_'.$strField] = $varValue;
-            }
-
+            $this->setFormTokens($strEntityId, $arrTokens);
+            $this->setMemberTokens($arrTokens);
             $objNotification = \NotificationCenter\Model\Notification::findByPk($objState->notification);
-            if ($objNotification === null) {
-                return null;
+            if (!$objNotification) {
+                $objNotification->send($arrTokens);
             }
-            $objNotification->send($arrTokens);
         }
 
         \Database::getInstance()->prepare('UPDATE tl_entity %s WHERE id=?')->set(['status' => $strStateId])->limit(1)->execute($strEntityId);
+    }
+
+    protected function setFormTokens($strEntityId, &$arrTokens) {
+
+        $objValues = \Database::getInstance()->prepare('SELECT * FROM tl_entity_value WHERE pid=?')->execute($strEntityId);
+
+        while ($objValues->next()) {
+
+            $objField = \FormFieldModel::findByPk($objValues->field);
+
+            if (!$objField) {
+                continue;
+            }
+
+            if (!$objField->name) {
+                continue;
+            }
+
+            $varValues = \StringUtil::deserialize($objValues->varValue);
+            if (is_array($varValues)) {
+                $arrValues = [];
+                foreach ($varValues as $strValue) {
+                    if (is_array($strValue)) {
+                        $strValue = (\Alnv\FrontendEditingBundle\Library\Helpers::makeArrayReadable($strValue));
+                    }
+                    if (\Validator::isUuid($strValue) || \Validator::isBinaryUuid($strValue)) {
+                        if ($objFile = \FilesModel::findByUuid($strValue)) {
+                            $strValue = $objFile->path;
+                        }
+                    }
+                    $arrValues[] = $strValue;
+                }
+                $varValues = implode(', ', $arrValues);
+            }
+
+            $arrTokens['form_'.$objField->name] = $varValues;
+        }
+    }
+
+    protected function setMemberTokens(&$arrTokens, $strMemberId=null) {
+        if (!$strMemberId) {
+            $strMemberId = \FrontendUser::getInstance()->id;
+        }
+        if (!$strMemberId) {
+            return null;
+        }
+        $objMember = \MemberModel::findByPk($strMemberId);
+        if (!$objMember) {
+            return null;
+        }
+        foreach ($objMember->row() as $strField => $strValue) {
+            $arrTokens['member_'.$strField] = $strValue;
+        }
     }
 
     public function getStateExcludes($strStateId) {

@@ -81,6 +81,9 @@
             let objDropzone = new Dropzone(document.getElementById('id_dropzone_<?= $this->id ?>'), objDropzoneOptions);
             objDropzone.on('complete', function (file) {
                 setError('');
+                if (!file.xhr) {
+                    return null;
+                }
                 let objResponse = JSON.parse(file.xhr.response);
                 if (!objResponse.success) {
                     setError((objResponse.error?objResponse.error:objResponse.message))
@@ -163,6 +166,7 @@
             }
 
             objInput.value = JSON.stringify(values);
+
             if (!blnSet) {
                 setError('<?= $GLOBALS['TL_LANG']['MSC']['uploadLimit']  ?>');
             }
