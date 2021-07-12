@@ -39,7 +39,7 @@ $GLOBALS['TL_DCA']['tl_states'] = [
         ]
     ],
     'palettes' => [
-        'default' => 'name,color'
+        'default' => 'name,notification,color,excludes'
     ],
     'fields' => [
         'id' => [
@@ -59,6 +59,26 @@ $GLOBALS['TL_DCA']['tl_states'] = [
             'search' => true,
             'sql' => ['type' => 'string', 'length' => 128, 'default' => '']
         ],
+        'notification' => [
+            'inputType' => 'select',
+            'eval' => [
+                'chosen' => true,
+                'tl_class' => 'w50',
+                'mandatory' => false,
+                'includeBlankOption' => true
+            ],
+            'options_callback' => function () {
+                $arrReturn = [];
+                $objNotificationCollection = \NotificationCenter\Model\Notification::findByType('feState');
+                if (null !== $objNotificationCollection) {
+                    while ($objNotificationCollection->next()) {
+                        $arrReturn[$objNotificationCollection->id] = $objNotificationCollection->title;
+                    }
+                }
+                return $arrReturn;
+            },
+            'sql' => ['type' => 'integer','notnull' => false,'unsigned' => true,'default' => 0]
+        ],
         'color' => [
             'inputType' => 'text',
             'eval' => [
@@ -67,6 +87,18 @@ $GLOBALS['TL_DCA']['tl_states'] = [
                 'tl_class' => 'w50 wizard'
             ],
             'sql' => ['type' => 'string', 'length' => 16, 'default' => '']
+        ],
+        'excludes' => [
+            'inputType' => 'checkbox',
+            'eval' => [
+                'multiple' => true,
+                'tl_class' => 'w50 clr'
+            ],
+            'reference' => &$GLOBALS['TL_LANG']['tl_states'],
+            'options_callback' => function () {
+                return ['delete', 'edit'];
+            },
+            'sql' => 'blob NULL'
         ]
     ]
 ];

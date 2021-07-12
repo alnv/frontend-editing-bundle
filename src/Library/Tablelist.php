@@ -96,6 +96,13 @@ class Tablelist {
             'label' => $GLOBALS['TL_LANG']['MSC']['deleteButton']
         ];
 
+        $arrExcludes = (new \Alnv\FrontendEditingBundle\Library\States())->getStateExcludes($arrEntity['status']['id']);
+        if (!empty($arrExcludes)) {
+            foreach ($arrExcludes as $strExclude) {
+                unset($arrReturn[$strExclude]);
+            }
+        }
+
         return $arrReturn;
     }
 

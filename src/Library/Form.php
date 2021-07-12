@@ -184,8 +184,8 @@ class Form {
         return $objEntity->row();
     }
 
-    public function setStatus($strStatusID, $strEntityId) {
+    public function setStatus($strStatusID, $strEntityId, $arrSubmits) {
 
-        \Database::getInstance()->prepare('UPDATE tl_entity %s WHERE id=?')->set(['status' => $strStatusID])->limit(1)->execute($strEntityId);
+        (new \Alnv\FrontendEditingBundle\Library\States())->changeState($strEntityId, $strStatusID, $arrSubmits);
     }
 }

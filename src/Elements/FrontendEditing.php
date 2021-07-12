@@ -2,7 +2,7 @@
 
 namespace Alnv\FrontendEditingBundle\Elements;
 
-class FrontendEditing extends  \ContentElement {
+class FrontendEditing extends \ContentElement {
 
     protected $arrSettings = [
         'saveMemberId' => false,
@@ -66,6 +66,10 @@ class FrontendEditing extends  \ContentElement {
         $objEntity = \Database::getInstance()->prepare('SELECT * FROM tl_entity WHERE id=?'.($this->arrSettings['saveMemberId'] ? ' AND member=?':''))->limit(1)->execute($arrValues);
         if (!$objEntity->numRows) {
             return null;
+        }
+
+        if (!(new \Alnv\FrontendEditingBundle\Library\States())->isAllowed('delete', $objEntity->status)) {
+            throw new \CoreBundle\Exception\AccessDeniedException('Page access denied: ' . \Environment::get('uri'));
         }
 
         $objValues = \Database::getInstance()->prepare('SELECT * FROM tl_entity_value WHERE pid=?')->execute($objEntity->id);
@@ -142,10 +146,14 @@ class FrontendEditing extends  \ContentElement {
 
     protected function generateForm() {
 
-        $blnSubmit = $this->isSubmitted();
         $strTemplate = 'fre_form';
+        $blnSubmit = $this->isSubmitted();
         $arrEntity = (new \Alnv\FrontendEditingBundle\Library\Form())->getEntityByAlias($this->strAlias);
         $arrFields = (new \Alnv\FrontendEditingBundle\Library\Form())->getFormFieldsByFormId($this->strActiveForm, $this->strAlias);
+
+        if (!(new \Alnv\FrontendEditingBundle\Library\States())->isAllowed('edit', $arrEntity['status'])) {
+            throw new \CoreBundle\Exception\AccessDeniedException('Page access denied: ' . \Environment::get('uri'));
+        }
 
         $arrTemplateData = [
             'submitId' => $this->getSubmitId(),
@@ -204,10 +212,11 @@ class FrontendEditing extends  \ContentElement {
         }
 
         if (!$arrEntity['status']) {
-            (new \Alnv\FrontendEditingBundle\Library\Form())->setStatus($this->arrSettings['status'], $arrEntity['id']);
+            (new \Alnv\FrontendEditingBundle\Library\Form())->setStatus($this->arrSettings['status'], $arrEntity['id'], $this->arrSubmitted);
         }
+
         if ($arrEntity['status'] && $this->arrSettings['status'] != $this->startStatus) {
-            (new \Alnv\FrontendEditingBundle\Library\Form())->setStatus($this->arrSettings['status'], $arrEntity['id']);
+            (new \Alnv\FrontendEditingBundle\Library\Form())->setStatus($this->arrSettings['status'], $arrEntity['id'], $this->arrSubmitted);
         }
 
         return $arrEntity['alias'];
