@@ -28,6 +28,7 @@
     "php":">=7.1",
     "ext-json": "*",
     "contao/core-bundle":"~4.4",
+    "phpoffice/phpspreadsheet": "^1.17",
     "terminal42/notification_center": "^1.5",
     "menatwork/contao-multicolumnwizard-bundle": "^3.4"
   },

@@ -6,6 +6,13 @@ $GLOBALS['TL_DCA']['tl_entity'] = [
         'dataContainer' => 'Table',
         'ptable' => 'tl_entity_group',
         'ctable' => ['tl_entity_value'],
+        'onload_callback' => [function() {
+            if (!\Input::get('export')) {
+                return null;
+            }
+            (new \Alnv\FrontendEditingBundle\Library\Export())->download();
+            \Controller::redirect(preg_replace('/&(amp;)?export=[^&]*/i', '', preg_replace( '/&(amp;)?' . preg_quote(\Input::get('import'), '/') . '=[^&]*/i', '', \Environment::get('request'))));
+        }],
         'sql' => [
             'keys' => [
                 'id' => 'primary'
@@ -47,6 +54,14 @@ $GLOBALS['TL_DCA']['tl_entity'] = [
             'show' => [
                 'href' => 'act=show',
                 'icon' => 'show.svg',
+            ]
+        ],
+        'global_operations' => [
+            'export' => [
+                'href' => 'export=1',
+                'icon' => 'pickfile.svg',
+                'label' => ['Exportieren', ''],
+                'attributes' => 'onclick="Backend.getScrollOffset()"'
             ]
         ]
     ],
