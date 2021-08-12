@@ -101,7 +101,7 @@ class Export extends \Controller {
             $numRows++;
         }
 
-        header('Content-Disposition: attachment;filename="export-' . $objForm->alias . '".xlsx');
+        header('Content-Disposition: attachment;filename="export-' . $objForm->alias . '.xlsx"');
         header('Cache-Control: max-age=0');
         header('Content-Type: application/vnd.ms-excel');
 

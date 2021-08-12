@@ -31,12 +31,15 @@ class Tablelist {
             }
 
             $arrSet['status'] = (new \Alnv\FrontendEditingBundle\Library\DataContainer())->getStatus($arrSet['status']);
-            $arrSet['title'] = \StringUtil::parseSimpleTokens($arrSettings['titleColumn'], $this->getFormTokens($arrValues));
+            $arrSet['title'] = $arrSettings['titleColumn'] ? \StringUtil::parseSimpleTokens($arrSettings['titleColumn'], $this->getFormTokens($arrValues)) : '';
             $arrSet['values'] = $arrValues;
             $arrSet['buttons'] = $this->getButtons($arrSet);
             $arrSet['updated_at'] = (new \Date($arrSet['stamp']))->datim;
             $arrSet['created_at'] = (new \Date($arrSet['created_at']))->datim;
-
+            $arrSet['group'] = \Database::getInstance()->prepare('SELECT * FROM tl_entity_group WHERE id=?')->limit(1)->execute($objEntities->pid)->row();
+            if ($objForm = \FormModel::findByPk($arrSet['group']['form'])) {
+                $arrSet['group']['form'] = $objForm->row();
+            }
             $arrReturn[] = $arrSet;
         }
 

@@ -32,7 +32,7 @@
         </tr>
         <?php foreach ($this->entities as $arrEntity): ?>
             <tr>
-                <td><?= nl2br($arrEntity['title']) ?></td>
+                <td><?= $arrEntity['title'] ? nl2br($arrEntity['title']) :$arrEntity['group']['form']['title'] ?></td>
                 <td><?= $arrEntity['created_at'] ?></td>
                 <td><?= $arrEntity['updated_at'] ?></td>
                 <td><span <?php if ($arrEntity['status']['color']): ?>style="color:<?= $arrEntity['status']['color'] ?>"<?php endif; ?>><?= $arrEntity['status']['name'] ?></span></td>

@@ -274,8 +274,8 @@ class FrontendEditing extends \ContentElement {
         $this->arrSettings['showForm'] = $_GET['auto_item'] || $this->disableList;
         $this->arrSettings['submitButtons'] = (new \Alnv\FrontendEditingBundle\Library\DataContainer())->getSubmitByChoice($this->submitButtons);
         $this->arrSettings['status'] = $this->startStatus ?: 0;
-        $this->arrSettings['titleColumn'] = $this->titleColumn ?: '-';
-        $this->arrSettings['titleHeadlineColumn'] = $this->titleHeadlineColumn ?: '-';
+        $this->arrSettings['titleColumn'] = $this->titleColumn ?: '';
+        $this->arrSettings['titleHeadlineColumn'] = $this->titleHeadlineColumn ?: '';
     }
 
     protected function getMemberId() {
