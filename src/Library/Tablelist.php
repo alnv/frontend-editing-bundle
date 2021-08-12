@@ -39,7 +39,11 @@ class Tablelist {
             $arrSet['group'] = \Database::getInstance()->prepare('SELECT * FROM tl_entity_group WHERE id=?')->limit(1)->execute($objEntities->pid)->row();
             if ($objForm = \FormModel::findByPk($arrSet['group']['form'])) {
                 $arrSet['group']['form'] = $objForm->row();
+                if (!in_array($arrSet['group']['form']['id'], $arrSettings['forms'])) {
+                    continue;
+                }
             }
+
             $arrReturn[] = $arrSet;
         }
 

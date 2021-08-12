@@ -281,6 +281,7 @@ class FrontendEditing extends \ContentElement {
         $this->arrSettings['submitButtons'] = (new \Alnv\FrontendEditingBundle\Library\DataContainer())->getSubmitByChoice($this->submitButtons);
         $this->arrSettings['status'] = $this->startStatus ?: 0;
         $this->arrSettings['titleColumn'] = $this->titleColumn ?: '';
+        $this->arrSettings['forms'] = \StringUtil::deserialize($this->forms, true);
         $this->arrSettings['titleHeadlineColumn'] = $this->titleHeadlineColumn ?: '';
     }
 
