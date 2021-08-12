@@ -37,6 +37,12 @@ class FrontendEditing extends \ContentElement {
         $this->deleteAndReload();
         $this->strActiveForm = $this->getFormId();
 
+        if ($_GET['auto_item']) {
+            if (!in_array($this->strActiveForm, array_keys($this->arrForms))) {
+                return '';
+            }
+        }
+
         return parent::generate();
     }
 

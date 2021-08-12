@@ -52,6 +52,7 @@
 </div>
 <script async defer>
     (function (){
+
         Dropzone.autoDiscover = false;
         Dropzone.prototype.defaultOptions.dictDefaultMessage = '<?= $GLOBALS["TL_LANG"]["MSC"]["dictDefaultMessage"] ?>';
         Dropzone.prototype.defaultOptions.dictFallbackMessage = '<?= $GLOBALS["TL_LANG"]["MSC"]["dictFallbackMessage"] ?>';
@@ -63,8 +64,11 @@
         Dropzone.prototype.defaultOptions.dictCancelUploadConfirmation = '<?= $GLOBALS["TL_LANG"]["MSC"]["dictCancelUploadConfirmation"] ?>';
         Dropzone.prototype.defaultOptions.dictRemoveFile = '<?= $GLOBALS["TL_LANG"]["MSC"]["dictRemoveFile"] ?>';
         Dropzone.prototype.defaultOptions.dictMaxFilesExceeded = '<?= $GLOBALS["TL_LANG"]["MSC"]["dictMaxFilesExceeded"] ?>';
-        let objDropzone = setUpDropzone();
+
+        setUpDropzone();
+
         function setUpDropzone() {
+
             clearUpload();
             let objDropzoneOptions = {
                 url: '/_dropzone/upload/<?= $this->id ?>',
@@ -78,6 +82,7 @@
                     uploads: <?= json_encode($arrFiles) ?>
                 }
             };
+
             let objDropzone = new Dropzone(document.getElementById('id_dropzone_<?= $this->id ?>'), objDropzoneOptions);
             objDropzone.on('complete', function (file) {
                 setError('');
@@ -99,6 +104,7 @@
                     }
                 }
             });
+
             objDropzone.on('removedfile', function (file) {
                 let objResponse = JSON.parse(file.xhr.response);
                 let objXHttp = new XMLHttpRequest();
@@ -107,6 +113,7 @@
                 removeUpload(objResponse.file.uuid)
 
             });
+
             let arrDeleteFiles = document.querySelectorAll("#id_list_<?= $this->id ?> button");
             for (let i=0;i<arrDeleteFiles.length;i++) {
                 let objButton = arrDeleteFiles[i];
@@ -122,14 +129,17 @@
                     }
                 });
             }
+
             return objDropzone;
         }
+
         function getUuidNodeFromButton(node) {
             if (node.dataset.uuid) {
                 return node;
             }
             return getUuidNodeFromButton(node.parentNode);
         }
+
         function removeUpload(uuid) {
             let objInput = document.querySelector('#id_input_<?= $this->id ?>');
             if (!objInput) {
@@ -142,6 +152,7 @@
             }
             objInput.value = JSON.stringify(values);
         }
+
         function setUpload(uuid) {
             let objInput = document.querySelector('#id_input_<?= $this->id ?>');
             if (!objInput) {
@@ -171,6 +182,7 @@
                 setError('<?= $GLOBALS['TL_LANG']['MSC']['uploadLimit']  ?>');
             }
         }
+
         function clearUpload() {
             let objInput = document.querySelector('#id_input_<?= $this->id ?>');
             if (!objInput) {
@@ -178,6 +190,7 @@
             }
             objInput.value = JSON.stringify(<?= json_encode($arrFiles) ?>);
         }
+
         function setError(message) {
             let objError = document.querySelector('#id_error_<?= $this->id ?>');
             if (!objError) {
