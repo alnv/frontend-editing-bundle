@@ -24,6 +24,7 @@
         <table id="id_list_<?= $this->id ?>">
             <tr>
                 <th><?= $GLOBALS['TL_LANG']['MSC']['uploadNameColumn'] ?></th>
+                <th><?= $GLOBALS['TL_LANG']['MSC']['uploadTitleColumn'] ?></th>
                 <th></th>
             </tr>
             <?php foreach ($arrFiles as $strUud): ?>
@@ -35,7 +36,14 @@
                 ?>
                 <?php if ($objFile = new \File($objFileModel->path)): ?>
                     <tr data-uuid="<?= \StringUtil::binToUuid($objFileModel->uuid) ?>">
-                        <td><div class="ce_download block"><p class="download-element ext-<?= $objFileModel->extension ?>"><?= $objFileModel->name ?> <span class="size">(<?= \Controller::getReadableSize($objFile->filesize) ?>)</span></p></div></td>
+                        <?php $arrMeta = \Alnv\FrontendEditingBundle\Library\FileHelper::getMeta($objFileModel->meta, $objFile); ?>
+                        <td><div class="ce_download block"><p class="download-element ext-<?= $objFileModel->extension ?>"><?= $arrMeta['title'] ?> <span class="size">(<?= \Controller::getReadableSize($objFile->filesize) ?>)</span></p></div></td>
+                        <td>
+                            <div class="widget widget-text">
+                                <input type="text" id="id_<?= \StringUtil::binToUuid($objFileModel->uuid) ?>" value="<?= $arrMeta['title'] ?>">
+                                <button type="button" class="button meta"><?= $GLOBALS['TL_LANG']['MSC']['submitSave'] ?></button>
+                            </div>
+                        </td>
                         <td><button type="button" class="button delete"><img src="/system/themes/flexible/icons/delete.svg" alt=""></button></td>
                     </tr>
                 <?php endif; ?>
@@ -70,6 +78,7 @@
         function setUpDropzone() {
 
             clearUpload();
+
             let objDropzoneOptions = {
                 url: '/_dropzone/upload/<?= $this->id ?>',
                 paramName: '<?= $this->name ?>',
@@ -114,7 +123,7 @@
 
             });
 
-            let arrDeleteFiles = document.querySelectorAll("#id_list_<?= $this->id ?> button");
+            let arrDeleteFiles = document.querySelectorAll("#id_list_<?= $this->id ?> button.delete");
             for (let i=0;i<arrDeleteFiles.length;i++) {
                 let objButton = arrDeleteFiles[i];
                 if (!objButton) {
@@ -126,6 +135,31 @@
                     if (node.dataset.uuid && typeof node.dataset.uuid !== 'undefined') {
                         removeUpload(node.dataset.uuid);
                         node.remove();
+                    }
+                });
+            }
+
+            let arrMetaButtons = document.querySelectorAll("#id_list_<?= $this->id ?> button.meta");
+            for (let i=0;i<arrMetaButtons.length;i++) {
+                let objButton = arrMetaButtons[i];
+                if (!objButton) {
+                    continue;
+                }
+                objButton.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    let node = getUuidNodeFromButton(this)
+                    if (node.dataset.uuid && typeof node.dataset.uuid !== 'undefined') {
+                        let strTitle = document.querySelector('#id_'+node.dataset.uuid).value;
+                        let objXmlHttp = new XMLHttpRequest();
+                        objXmlHttp.onreadystatechange = function() {
+                            if (objXmlHttp.readyState === XMLHttpRequest.DONE) {
+                                console.log(objXmlHttp.responseText)
+                            }
+                        };
+                        let strParams = 'uuid='+node.dataset.uuid+'&title='+strTitle+'&language=<?= \Alnv\FrontendEditingBundle\Library\FileHelper::getCurrentLanguage() ?>';
+                        objXmlHttp.open('POST', '_dropzone/file/title', true);
+                        objXmlHttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+                        objXmlHttp.send(strParams);
                     }
                 });
             }

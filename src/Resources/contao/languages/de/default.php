@@ -13,6 +13,7 @@ $GLOBALS['TL_LANG']['MSC']['uploadMessageTryAgain'] = 'Leider konnten wir Ihre D
 $GLOBALS['TL_LANG']['MSC']['uploadLimit'] = 'Sie können keine weiteren Dateien hochladen';
 $GLOBALS['TL_LANG']['MSC']['uploadReset'] = 'Hochgeladene Dateien zurücksetzen';
 $GLOBALS['TL_LANG']['MSC']['uploadNameColumn'] = 'Name';
+$GLOBALS['TL_LANG']['MSC']['uploadTitleColumn'] = 'Meta-Titel';
 $GLOBALS["TL_LANG"]["MSC"]["dropzoneDzMessage"] = 'Datei hier zum Hochladen ablegen.';
 
 $GLOBALS["TL_LANG"]["MSC"]["dictDefaultMessage"] = "Dateien zum Hochladen hier ablegen";

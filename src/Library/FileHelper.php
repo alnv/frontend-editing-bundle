@@ -28,6 +28,24 @@ class FileHelper {
         }
     }
 
+    public static function getCurrentLanguage() {
+
+        $objContainer = \System::getContainer();
+
+        return $objContainer->get('request_stack')->getCurrentRequest()->getLocale();
+    }
+
+    public static function getMeta($strMeta, $objFile) {
+
+        $arrMeta = \Frontend::getMetaData($strMeta, static::getCurrentLanguage());
+
+        if ($arrMeta['title'] == '') {
+            $arrMeta['title'] = \StringUtil::specialchars($objFile->basename);
+        }
+
+        return $arrMeta;
+    }
+
     public static function getFiles($strUuids, $arrOrder) {
 
         $arrFiles = [];
@@ -56,10 +74,7 @@ class FileHelper {
                 }
 
                 $GLOBALS['DOWNLOADABLE-FILES'][] = $objFiles->path;
-                $arrMeta = \Frontend::getMetaData($objFiles->meta, $objContainer->get('request_stack')->getCurrentRequest()->getLocale());
-                if ($arrMeta['title'] == '') {
-                    $arrMeta['title'] = \StringUtil::specialchars($objFiles->basename);
-                }
+                $arrMeta = static::getMeta($objFiles->meta, $objFiles);
 
                 $strHref = \Environment::get('request');
                 if (isset($_GET['file'])) {
@@ -107,11 +122,7 @@ class FileHelper {
                         continue;
                     }
 
-                    $arrMeta = \Frontend::getMetaData($objSubfiles->meta, $objContainer->get('request_stack')->getCurrentRequest()->getLocale());
-                    if ($arrMeta['title'] == '') {
-                        $arrMeta['title'] = \StringUtil::specialchars($objFile->basename);
-                    }
-
+                    $arrMeta = static::getMeta($objSubfiles->meta, $objFile);
                     $strHref = \Environment::get('request');
                     if (preg_match('/(&(amp;)?|\?)file=/', $strHref)) {
                         $strHref = preg_replace('/(&(amp;)?|\?)file=[^&]+/', '', $strHref);

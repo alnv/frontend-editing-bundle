@@ -60,6 +60,34 @@ class UploadController extends Controller {
 
     /**
      *
+     * @Route("/file/title", name="changeMetaTitle")
+     * @Method({"POST"})
+     */
+    public function changeMetaTitle() {
+
+        $this->container->get('contao.framework')->initialize();
+
+        $objFile = \FilesModel::findByUuid(\Input::post('uuid'));
+
+        if (!$objFile || !\Input::post('language')) {
+            return new JsonResponse(['done' => false]);
+        }
+
+        $arrMeta = \StringUtil::deserialize($objFile->meta, true);
+        if (!isset($arrMeta[\Input::post('language')])) {
+            $arrMeta[\Input::post('language')] = [];
+        }
+
+        $arrMeta[\Input::post('language')]['title'] = \Input::post('title') ?: '';
+
+        $objFile->meta = serialize($arrMeta);
+        $objFile->save();
+
+        return new JsonResponse(['done' => true, 'meta' => $arrMeta]);
+    }
+
+    /**
+     *
      * @Route("/remove/{uuid}", name="remove")
      * @Method({"POST"})
      */
@@ -75,6 +103,7 @@ class UploadController extends Controller {
     }
 
     protected function clearUploads($objField) {
+
         $varUploads = $this->getUploadsParam();
         if (!$objField->multiple && !empty($varUploads)) {
             foreach ($varUploads as $strUuid) {
@@ -88,6 +117,7 @@ class UploadController extends Controller {
     }
 
     protected function getUploadsParam() {
+
         $varUploads = \Input::post('uploads');
         if (!is_array($varUploads) && !empty($varUploads)) {
             $varUploads = [$varUploads];
