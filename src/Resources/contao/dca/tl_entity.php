@@ -66,7 +66,7 @@ $GLOBALS['TL_DCA']['tl_entity'] = [
         ]
     ],
     'palettes' => [
-        'default' => 'status,member'
+        'default' => 'status,member,uploads'
     ],
     'fields' => [
         'id' => [
@@ -128,6 +128,22 @@ $GLOBALS['TL_DCA']['tl_entity'] = [
             ],
             'foreignKey' => 'tl_states.name',
             'sql' => ['type' => 'integer', 'notnull' => false, 'unsigned' => true]
+        ],
+        'uploads' => [
+            'inputType' => 'fileTree',
+            'eval' => [
+                'multiple' => true,
+                'tl_class' => 'clr',
+                'fieldType' => 'checkbox',
+                'orderField' => 'uploadsOrderSRC',
+                'isDownloads' => true,
+                'files' => true
+            ],
+            'sql' => "blob NULL"
+        ],
+        'uploadsOrderSRC' => [
+            'label' => &$GLOBALS['TL_LANG']['MSC']['uploadsOrderSRC'],
+            'sql' => 'blob NULL'
         ]
     ]
 ];

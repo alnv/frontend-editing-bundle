@@ -22,6 +22,9 @@ array_insert($GLOBALS['BE_MOD'], 1, [
     ]
 ]);
 
+$GLOBALS['DOWNLOADABLE-FILES'] = [];
+$GLOBALS['BE_MOD']['accounts']['member']['tables'][] = 'tl_entity';
+
 $GLOBALS['NOTIFICATION_CENTER']['NOTIFICATION_TYPE']['FRONTEND-EDITING'] = [
     'feState' => [
         'recipients' => ['admin_email', 'form_*', 'member_*'],

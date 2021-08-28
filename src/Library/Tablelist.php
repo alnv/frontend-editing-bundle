@@ -2,6 +2,8 @@
 
 namespace Alnv\FrontendEditingBundle\Library;
 
+use Haste\Util\StringUtil;
+
 class Tablelist {
 
     public function getEntities($arrSettings) {
@@ -42,6 +44,11 @@ class Tablelist {
                 if (!in_array($arrSet['group']['form']['id'], $arrSettings['forms'])) {
                     continue;
                 }
+            }
+
+            $arrSet['uploads'] = \Alnv\FrontendEditingBundle\Library\FileHelper::getFiles($arrSet['uploads'], \StringUtil::deserialize($arrSet['uploadsOrderSRC'], true));
+            if (!empty($arrSet['status']['uploads'])) {
+                array_insert($arrSet['uploads'], 0, $arrSet['status']['uploads']);
             }
 
             $arrReturn[] = $arrSet;

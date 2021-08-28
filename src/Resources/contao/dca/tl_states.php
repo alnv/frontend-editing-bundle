@@ -39,7 +39,7 @@ $GLOBALS['TL_DCA']['tl_states'] = [
         ]
     ],
     'palettes' => [
-        'default' => 'name,notification,color,excludes'
+        'default' => 'name,note,notification,color,excludes,uploads'
     ],
     'fields' => [
         'id' => [
@@ -98,6 +98,32 @@ $GLOBALS['TL_DCA']['tl_states'] = [
             'options_callback' => function () {
                 return ['delete', 'edit'];
             },
+            'sql' => 'blob NULL'
+        ],
+        'note' => [
+            'inputType' => 'textarea',
+            'eval' => [
+                'rte' => 'tinyMCE',
+                'tl_class' => 'clr',
+                'helpwizard' => true
+            ],
+            'explanation' => 'insertTags',
+            'sql' => "mediumtext NULL"
+        ],
+        'uploads' => [
+            'inputType' => 'fileTree',
+            'eval' => [
+                'multiple' => true,
+                'tl_class' => 'clr',
+                'fieldType' => 'checkbox',
+                'orderField' => 'uploadsOrderSRC',
+                'isDownloads' => true,
+                'files' => true
+            ],
+            'sql' => "blob NULL"
+        ],
+        'uploadsOrderSRC' => [
+            'label' => &$GLOBALS['TL_LANG']['MSC']['uploadsOrderSRC'],
             'sql' => 'blob NULL'
         ]
     ]

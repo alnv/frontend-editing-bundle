@@ -25,8 +25,8 @@
     <table>
         <tr>
             <th><?= $this->titleHeadline ?></th>
-            <th>erstellt am</th>
-            <th>aktualisiert am</th>
+            <th>Erstellt am</th>
+            <th>Aktualisiert am</th>
             <th>Status</th>
             <th></th>
         </tr>
@@ -35,7 +35,23 @@
                 <td><?= $arrEntity['title'] ? nl2br($arrEntity['title']) :$arrEntity['group']['form']['title'] ?></td>
                 <td><?= $arrEntity['created_at'] ?></td>
                 <td><?= $arrEntity['updated_at'] ?></td>
-                <td><span <?php if ($arrEntity['status']['color']): ?>style="color:<?= $arrEntity['status']['color'] ?>"<?php endif; ?>><?= $arrEntity['status']['name'] ?></span></td>
+                <td>
+                    <span <?php if ($arrEntity['status']['color']): ?>style="color:#<?= $arrEntity['status']['color'] ?>"<?php endif; ?>><?= $arrEntity['status']['name'] ?></span>
+                    <?php if ($arrEntity['status']['note']): ?>
+                        <?= $arrEntity['status']['note'] ?>
+                    <?php endif; ?>
+                    <?php if (!empty($arrEntity['uploads'])): ?>
+                        <div class="ce_downloads block">
+                            <ul>
+                                <?php foreach ($arrEntity['uploads'] as $strPath => $arrFile): ?>
+                                    <li class="download-element ext-<?= $arrFile['extension'] ?>">
+                                        <a href="<?= $arrFile['href'] ?>" title="<?= $arrFile['title'] ?>" type="<?= $arrFile['mime'] ?>"><?= $arrFile['link'] ?> <span class="size">(<?= $arrFile['filesize'] ?>)</span></a>
+                                    </li>
+                                <?php endforeach; ?>
+                            </ul>
+                        </div>
+                    <?php endif; ?>
+                </td>
                 <td>
                     <?php foreach ($arrEntity['buttons'] as $arrButton): ?>
                         <a href="<?= $arrButton['href'] ?>"><img src="<?= $arrButton['icon'] ?>" alt="<?= $arrButton['label'] ?>"></a>

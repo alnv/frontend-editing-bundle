@@ -29,7 +29,10 @@ class DataContainer {
     public function getStatus($strStatusId) {
 
         $objStatus = \Database::getInstance()->prepare('SELECT * FROM tl_states WHERE id=?')->limit(1)->execute($strStatusId);
+        $arrReturn = $objStatus->row();
+        $arrReturn['note'] = \Controller::replaceInsertTags(\StringUtil::decodeEntities($arrReturn['note']));
+        $arrReturn['uploads'] = \Alnv\FrontendEditingBundle\Library\FileHelper::getFiles($arrReturn['uploads'], \StringUtil::deserialize($arrReturn['uploadsOrderSRC'], true));
 
-        return $objStatus->row();
+        return $arrReturn;
     }
 }

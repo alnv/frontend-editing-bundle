@@ -138,7 +138,9 @@ class FrontendEditing extends \ContentElement {
 
         $strTemplate = 'fre_tablelist';
         $objTemplate = new \FrontendTemplate($strTemplate);
-        
+
+        \Alnv\FrontendEditingBundle\Library\FileHelper::sendFileToBrowser();
+
         $objTemplate->setData([
             'id' => $this->id,
             'forms' => $this->arrForms,
