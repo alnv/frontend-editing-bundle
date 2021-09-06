@@ -184,25 +184,28 @@ class FrontendEditing extends \ContentElement {
             $arrTemplateData['fields'][$strField] = $objWidget->parse();
         }
 
-        if ($blnSubmit) {
-            switch ($this->strSubmitType) {
-                case 'save':
+        switch ($this->strSubmitType) {
+            case 'save':
+                if ($blnSubmit) {
                     $strCurrentAlias = $this->save();
                     $this->redirectTo($strCurrentAlias);
-                    break;
-                case 'back':
-                    $this->redirectBack();
-                    break;
-                case 'changeNsave':
-                case 'saveNback':
+                }
+                break;
+            case 'back':
+                $this->redirectBack();
+                break;
+            case 'changeNsave':
+            case 'saveNback':
+                if ($blnSubmit) {
                     $this->save();
                     $this->redirectBack();
-                    break;
-                case 'saveNcreate':
+                }
+                break;
+            case 'saveNcreate':
+                if ($blnSubmit) {
                     $this->save();
-                    // todo
-                    break;
-            }
+                }
+                break;
         }
 
         $objTemplate->setData($arrTemplateData);

@@ -3,7 +3,6 @@
 namespace Alnv\FrontendEditingBundle\Controller;
 
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 
@@ -11,7 +10,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
  *
  * @Route("/_dropzone", defaults={"_scope"="frontend", "_token_check"=false})
  */
-class UploadController extends Controller {
+class UploadController extends \Contao\CoreBundle\Controller\AbstractController {
 
     /**
      *
