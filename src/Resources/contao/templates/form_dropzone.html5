@@ -80,7 +80,7 @@
             clearUpload();
 
             let objDropzoneOptions = {
-                url: '/_dropzone/upload/<?= $this->id ?>',
+                url: '/dropzone/upload/<?= $this->id ?>',
                 paramName: '<?= $this->name ?>',
                 parallelUploads: 1,
                 maxFilesize: <?= ($this->maxlength?$this->maxlength:256) ?>,
@@ -117,7 +117,7 @@
             objDropzone.on('removedfile', function (file) {
                 let objResponse = JSON.parse(file.xhr.response);
                 let objXHttp = new XMLHttpRequest();
-                objXHttp.open('POST', '/_dropzone/remove/'+objResponse.file.uuid, true);
+                objXHttp.open('POST', '/dropzone/remove/'+objResponse.file.uuid, true);
                 objXHttp.send();
                 removeUpload(objResponse.file.uuid)
 
@@ -157,7 +157,7 @@
                             }
                         };
                         let strParams = 'uuid='+node.dataset.uuid+'&title='+strTitle+'&language=<?= \Alnv\FrontendEditingBundle\Library\FileHelper::getCurrentLanguage() ?>';
-                        objXmlHttp.open('POST', '_dropzone/file/title', true);
+                        objXmlHttp.open('POST', 'dropzone/file/title', true);
                         objXmlHttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
                         objXmlHttp.send(strParams);
                     }

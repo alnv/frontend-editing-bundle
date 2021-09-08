@@ -78,11 +78,22 @@ class FrontendEditing extends \ContentElement {
             throw new \CoreBundle\Exception\AccessDeniedException('Page access denied: ' . \Environment::get('uri'));
         }
 
+        if (isset($GLOBALS['TL_HOOKS']['onDeleteEntity']) && is_array($GLOBALS['TL_HOOKS']['onDeleteEntity'])) {
+            foreach ($GLOBALS['TL_HOOKS']['onDeleteEntity'] as $arrCallback) {
+                if (is_array($arrCallback)) {
+                    $this->import($arrCallback[0]);
+                    $this->{$arrCallback[0]}->{$arrCallback[1]}($objEntity->row(), $this);
+                }
+                elseif (\is_callable($arrCallback)) {
+                    $arrCallback($objEntity->row(), $this);
+                }
+            }
+        }
+
         $objValues = \Database::getInstance()->prepare('SELECT * FROM tl_entity_value WHERE pid=?')->execute($objEntity->id);
         while ($objValues->next()) {
             \Database::getInstance()->prepare('DELETE FROM tl_entity_value WHERE id=?')->limit(1)->execute($objValues->id);
         }
-
         \Database::getInstance()->prepare('DELETE FROM tl_entity WHERE id=?')->limit(1)->execute($objEntity->id);
         \Controller::redirect($objPage->getFrontendUrl());
     }

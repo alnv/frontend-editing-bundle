@@ -2,7 +2,11 @@
 
 namespace Alnv\FrontendEditingBundle\Library;
 
-class States {
+class States extends \Controller {
+
+    public function __construct() {
+        parent::__construct();
+    }
 
     public function changeState($strEntityId, $strStateId) {
 
@@ -27,6 +31,18 @@ class States {
             $objNotification = \NotificationCenter\Model\Notification::findByPk($objState->notification);
             if (!$objNotification) {
                 $objNotification->send($arrTokens);
+            }
+        }
+
+        if (isset($GLOBALS['TL_HOOKS']['changeState']) && is_array($GLOBALS['TL_HOOKS']['changeState'])) {
+            foreach ($GLOBALS['TL_HOOKS']['changeState'] as $arrCallback) {
+                if (is_array($arrCallback)) {
+                    $this->import($arrCallback[0]);
+                    $this->{$arrCallback[0]}->{$arrCallback[1]}($strEntityId, $strStateId, $this);
+                }
+                elseif (\is_callable($arrCallback)) {
+                    $arrCallback($strEntityId, $strStateId, $this);
+                }
             }
         }
 
@@ -71,16 +87,20 @@ class States {
     }
 
     protected function setMemberTokens(&$arrTokens, $strMemberId=null) {
+
         if (!$strMemberId) {
             $strMemberId = \FrontendUser::getInstance()->id;
         }
+
         if (!$strMemberId) {
             return null;
         }
+
         $objMember = \MemberModel::findByPk($strMemberId);
         if (!$objMember) {
             return null;
         }
+
         foreach ($objMember->row() as $strField => $strValue) {
             $arrTokens['member_'.$strField] = $strValue;
         }

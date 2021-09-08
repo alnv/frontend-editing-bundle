@@ -8,13 +8,13 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 
 /**
  *
- * @Route("/_dropzone", defaults={"_scope"="frontend", "_token_check"=false})
+ * @Route("/dropzone", defaults={"_scope"="frontend", "_token_check"=false})
  */
 class UploadController extends \Contao\CoreBundle\Controller\AbstractController {
 
     /**
      *
-     * @Route("/upload/{id}", name="upload")
+     * @Route("/upload/{id}", name="dropzone-upload")
      * @Method({"POST"})
      */
     public function upload($id) {
@@ -59,7 +59,7 @@ class UploadController extends \Contao\CoreBundle\Controller\AbstractController 
 
     /**
      *
-     * @Route("/file/title", name="changeMetaTitle")
+     * @Route("/file/title", name="dropzone-changeMetaTitle")
      * @Method({"POST"})
      */
     public function changeMetaTitle() {
@@ -87,7 +87,7 @@ class UploadController extends \Contao\CoreBundle\Controller\AbstractController 
 
     /**
      *
-     * @Route("/remove/{uuid}", name="remove")
+     * @Route("/remove/{uuid}", name="dropzone-remove")
      * @Method({"POST"})
      */
     public function remove($uuid) {

@@ -11,7 +11,7 @@ $GLOBALS['TL_DCA']['tl_entity'] = [
                 return null;
             }
             (new \Alnv\FrontendEditingBundle\Library\Export())->download();
-            \Controller::redirect(preg_replace('/&(amp;)?export=[^&]*/i', '', preg_replace( '/&(amp;)?' . preg_quote(\Input::get('import'), '/') . '=[^&]*/i', '', \Environment::get('request'))));
+            \Controller::redirect(preg_replace('/&(amp;)?export=[^&]*/i', '', preg_replace( '/&(amp;)?' . preg_quote(\Input::get('export'), '/') . '=[^&]*/i', '', \Environment::get('request'))));
         }],
         'sql' => [
             'keys' => [
