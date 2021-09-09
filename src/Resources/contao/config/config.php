@@ -2,6 +2,7 @@
 
 $GLOBALS['TL_FFL']['dropzone'] = 'Alnv\FrontendEditingBundle\Form\FormDropzoneUpload';
 $GLOBALS['TL_CTE']['frontend_editing-bundle']['frontend_editing'] = 'Alnv\FrontendEditingBundle\Elements\FrontendEditing';
+$GLOBALS['TL_HOOKS']['replaceInsertTags'][] = ['frontendediting.inserttags.ignoretags', 'replace'];
 
 array_insert($GLOBALS['BE_MOD'], 1, [
     'frontend-editing-bundle' => [

@@ -2,6 +2,8 @@ services:
   _defaults:
     autowire: true
     autoconfigure: true
-
   Alnv\FrontendEditingBundle\Controller\UploadController:
+    public: true
+  frontendediting.inserttags.ignoretags:
+    class: Alnv\FrontendEditingBundle\Inserttags\IgnoreTags
     public: true
