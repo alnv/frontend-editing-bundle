@@ -2,7 +2,7 @@
 
 namespace Alnv\FrontendEditingBundle\Library;
 
-class Form {
+class Form extends \System {
 
     public function getRawFormFieldsByFormId($strFormId) {
 
@@ -19,6 +19,15 @@ class Form {
                 else {
                     $arrFields[] = $objFields->current();
                 }
+            }
+        }
+
+        if (isset($GLOBALS['TL_HOOKS']['compileFormFields']) && is_array($GLOBALS['TL_HOOKS']['compileFormFields']))
+        {
+            foreach ($GLOBALS['TL_HOOKS']['compileFormFields'] as $callback)
+            {
+                $this->import($callback[0]);
+                $arrFields = $this->{$callback[0]}->{$callback[1]}($arrFields, $strFormId, $this);
             }
         }
 
