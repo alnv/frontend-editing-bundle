@@ -10,7 +10,7 @@ $GLOBALS['TL_DCA']['tl_entity'] = [
             if (!\Input::get('export')) {
                 return null;
             }
-            (new \Alnv\FrontendEditingBundle\Library\Export())->download();
+            (new \Alnv\FrontendEditingBundle\Library\Export())->download(\Input::get('id'));
             \Controller::redirect(preg_replace('/&(amp;)?export=[^&]*/i', '', preg_replace( '/&(amp;)?' . preg_quote(\Input::get('export'), '/') . '=[^&]*/i', '', \Environment::get('request'))));
         }],
         'sql' => [

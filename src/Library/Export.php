@@ -5,7 +5,12 @@ namespace Alnv\FrontendEditingBundle\Library;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
-class Export extends \Controller {
+class Export extends \System {
+
+    public function __construct() {
+
+        parent::__construct();
+    }
 
     public function parseValue($strValue, $objField) {
 
@@ -27,9 +32,9 @@ class Export extends \Controller {
         return $strValue;
     }
 
-    public function download() {
+    public function download($strEntityGroupId, $strPath='', $arrOnly=[]) {
 
-        $objEntityGroup = \Database::getInstance()->prepare('SELECT * FROM tl_entity_group WHERE id=?')->limit(1)->execute(\Input::get('id'));
+        $objEntityGroup = \Database::getInstance()->prepare('SELECT * FROM tl_entity_group WHERE id=?')->limit(1)->execute($strEntityGroupId);
 
         if (!$objEntityGroup->numRows) {
             return null;
@@ -41,11 +46,17 @@ class Export extends \Controller {
             return null;
         }
 
+        if (TL_MODE == 'FE') {
+            $strUser = \FrontendUser::getInstance()->username;
+        } else {
+            $strUser = \BackendUser::getInstance()->email;
+        }
+
         $objSpreadsheet = new Spreadsheet();
         $objSpreadsheet->getProperties()
             ->setTitle($objForm->title)
             ->setCreator('Contao CMS')
-            ->setLastModifiedBy(\BackendUser::getInstance()->email);
+            ->setLastModifiedBy($strUser);
 
         $objSheet = $objSpreadsheet->getActiveSheet();
 
@@ -53,6 +64,12 @@ class Export extends \Controller {
         $objEntities = \Database::getInstance()->prepare('SELECT * FROM tl_entity WHERE pid=? ORDER BY sorting')->execute($objEntityGroup->id);
 
         while ($objEntities->next()) {
+
+            if (!empty($arrOnly) && is_array($arrOnly)) {
+                if (!in_array($objEntities->id, $arrOnly)) {
+                    continue;
+                }
+            }
 
             $arrEntity = [];
             $objValues = \Database::getInstance()->prepare('SELECT * FROM tl_entity_value WHERE pid=?')->execute($objEntities->id);
@@ -101,12 +118,19 @@ class Export extends \Controller {
             $numRows++;
         }
 
-        header('Content-Disposition: attachment;filename="export-' . $objForm->alias . '.xlsx"');
-        header('Cache-Control: max-age=0');
-        header('Content-Type: application/vnd.ms-excel');
+        if (!$strPath) {
 
-        $objXls = new Xlsx($objSpreadsheet);
-        $objXls->save('php://output');
-        exit;
+            header('Content-Disposition: attachment;filename="export-' . $objForm->alias . '.xlsx"');
+            header('Cache-Control: max-age=0');
+            header('Content-Type: application/vnd.ms-excel');
+
+            $objXls = new Xlsx($objSpreadsheet);
+            $objXls->save('php://output');
+            exit;
+        } else {
+
+            $objXls = new Xlsx($objSpreadsheet);
+            $objXls->save($strPath);
+        }
     }
 }
