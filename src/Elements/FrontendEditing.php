@@ -175,6 +175,7 @@ class FrontendEditing extends \ContentElement {
         }
 
         $arrTemplateData = [
+            'formId' => $this->strActiveForm,
             'submitId' => $this->getSubmitId(),
             'buttons' => $this->arrSettings['submitButtons'],
             'entity' => $arrEntity ?: [],
