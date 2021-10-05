@@ -41,7 +41,7 @@
                         <td>
                             <div class="widget widget-text">
                                 <input type="text" id="id_<?= \StringUtil::binToUuid($objFileModel->uuid) ?>" value="<?= $arrMeta['title'] ?>">
-                                <button type="button" class="button meta"><?= $GLOBALS['TL_LANG']['MSC']['submitSave'] ?></button>
+                                <button type="button" class="button meta"><?= $GLOBALS['TL_LANG']['MSC']['submitMeta'] ?></button>
                             </div>
                         </td>
                         <td><button type="button" class="button delete"><img src="/system/themes/flexible/icons/delete.svg" alt=""></button></td>

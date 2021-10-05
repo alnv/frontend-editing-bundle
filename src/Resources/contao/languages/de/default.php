@@ -1,6 +1,7 @@
 <?php
 
 $GLOBALS['TL_LANG']['MSC']['submitSave'] = 'Speichern';
+$GLOBALS['TL_LANG']['MSC']['submitMeta'] = 'Speichern';
 $GLOBALS['TL_LANG']['MSC']['submitBack'] = 'Zurück';
 $GLOBALS['TL_LANG']['MSC']['submitSaveNback'] = 'Speichern und zurück';
 $GLOBALS['TL_LANG']['MSC']['submitSaveNcreate'] = 'Speichern und neu';
