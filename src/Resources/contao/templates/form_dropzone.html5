@@ -37,7 +37,17 @@
                 <?php if ($objFile = new \File($objFileModel->path)): ?>
                     <tr data-uuid="<?= \StringUtil::binToUuid($objFileModel->uuid) ?>">
                         <?php $arrMeta = \Alnv\FrontendEditingBundle\Library\FileHelper::getMeta($objFileModel->meta, $objFile); ?>
-                        <td><div class="ce_download block"><p class="download-element ext-<?= $objFileModel->extension ?>"><?= $arrMeta['title'] ?> <span class="size">(<?= \Controller::getReadableSize($objFile->filesize) ?>)</span></p></div></td>
+                        <td>
+                            <div class="ce_download block">
+                                <?php if (in_array($objFileModel->extension, ['png','jpeg','jpg'])): ?>
+                                    <figure>
+                                        <img src="<?= $objFileModel->path ?>" alt="" style="max-height:75px">
+                                    </figure>
+                                <?php else: ?>
+                                    <p class="download-element ext-<?= $objFileModel->extension ?>"><?= $arrMeta['title'] ?> <span class="size">(<?= \Controller::getReadableSize($objFile->filesize) ?>)</span></p>
+                                <?php endif; ?>
+                            </div>
+                        </td>
                         <td>
                             <div class="widget widget-text">
                                 <input type="text" id="id_<?= \StringUtil::binToUuid($objFileModel->uuid) ?>" value="<?= $arrMeta['title'] ?>">
@@ -88,7 +98,7 @@
                 timeout: 0,
                 addRemoveLinks: true,
                 params: {
-                    uploads: <?= json_encode($arrFiles) ?>
+                    uploads: <?= (empty($arrFiles)?'[]':json_encode($arrFiles, 512)) ?>
                 }
             };
 
@@ -188,10 +198,12 @@
         }
 
         function setUpload(uuid) {
+
             let objInput = document.querySelector('#id_input_<?= $this->id ?>');
             if (!objInput) {
                 return null;
             }
+
             let blnSet = false;
             let multiple = <?= ($this->multiple?'true':'false') ?>;
             let values = objInput.value ? JSON.parse(objInput.value) : [];

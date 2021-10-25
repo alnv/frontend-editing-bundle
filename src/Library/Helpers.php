@@ -31,7 +31,9 @@ class Helpers {
 
         $arrReturn = [];
         foreach ($arrFiles as $strValue) {
-            if (\Validator::isUuid($strValue)) {
+            if (\Validator::isBinaryUuid($strValue)) {
+                $arrReturn[] = \StringUtil::binToUuid($strValue);
+            } elseif (\Validator::isUuid($strValue)) {
                 $arrReturn[] = $strValue;
             }
         }
