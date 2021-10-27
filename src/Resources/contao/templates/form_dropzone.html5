@@ -43,6 +43,7 @@
                                     <figure>
                                         <img src="<?= $objFileModel->path ?>" alt="" style="max-height:75px">
                                     </figure>
+                                    <p class="download-element ext-<?= $objFileModel->extension ?>"><?= $arrMeta['title'] ?> <span class="size">(<?= \Controller::getReadableSize($objFile->filesize) ?>)</span></p>
                                 <?php else: ?>
                                     <p class="download-element ext-<?= $objFileModel->extension ?>"><?= $arrMeta['title'] ?> <span class="size">(<?= \Controller::getReadableSize($objFile->filesize) ?>)</span></p>
                                 <?php endif; ?>
