@@ -1,4 +1,4 @@
-<form method="POST" novalidate>
+<form method="POST">
     <div class="formbody">
         <input type="hidden" name="FORM_SUBMIT" value="<?= $this->submitId ?>">
         <input type="hidden" name="REQUEST_TOKEN" value="{{request_token}}">
