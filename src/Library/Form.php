@@ -157,7 +157,6 @@ class Form extends \System {
 
     public function createEntityByAliasAndFormId($strAlias, $strFormId, $strMember=null) {
 
-        $strGroupId = null;
         $objEntityGroup = \Database::getInstance()->prepare('SELECT * FROM tl_entity_group WHERE form=?')->limit(1)->execute($strFormId);
 
         if (!$objEntityGroup->numRows) {
