@@ -74,14 +74,16 @@ class Form extends \System {
                     }
                 }
 
+                $arrData['value'] = $arrData['value'] ?? '';
+
                 if ($arrData['value'] === '') {
-                    $arrData['value'] = $arrData['default'];
+                    $arrData['value'] = $arrData['default'] ?? '';
                 }
 
                 if ($arrData['type'] == 'submit') {
                     $arrData['name'] = 'changeNsave';
                     if ($arrData['status']) {
-                        if ($arrEntity['status'] == $arrData['status']) {
+                        if (($arrEntity['status']??'') == $arrData['status']) {
                             --$intMaxRow;
                             continue;
                         }

@@ -170,7 +170,7 @@ class FrontendEditing extends \ContentElement {
         $arrEntity = (new \Alnv\FrontendEditingBundle\Library\Form())->getEntityByAlias($this->strAlias);
         $arrFields = (new \Alnv\FrontendEditingBundle\Library\Form())->getFormFieldsByFormId($this->strActiveForm, $this->strAlias);
 
-        if (!(new \Alnv\FrontendEditingBundle\Library\States())->isAllowed('edit', $arrEntity['status'])) {
+        if (!(new \Alnv\FrontendEditingBundle\Library\States())->isAllowed('edit', ($arrEntity['status']??''))) {
             throw new \CoreBundle\Exception\AccessDeniedException('Page access denied: ' . \Environment::get('uri'));
         }
 
