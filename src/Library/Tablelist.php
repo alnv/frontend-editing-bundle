@@ -107,7 +107,8 @@ class Tablelist {
         $arrReturn['delete'] = [
             'href' => $objPage->getFrontendUrl('/delete') . '?id='.$arrEntity['id'],
             'icon' => 'system/themes/flexible/icons/delete.svg',
-            'label' => $GLOBALS['TL_LANG']['MSC']['deleteButton']
+            'label' => $GLOBALS['TL_LANG']['MSC']['deleteButton'],
+            'attributes' => ' onclick="return confirm(\'Sind Sie sicher, dass Sie den Beitrag löschen wollen?\')"'
         ];
 
         $arrExcludes = (new \Alnv\FrontendEditingBundle\Library\States())->getStateExcludes($arrEntity['status']['id']);

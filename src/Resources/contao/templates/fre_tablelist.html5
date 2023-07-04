@@ -54,7 +54,7 @@
                 </td>
                 <td>
                     <?php foreach ($arrEntity['buttons'] as $arrButton): ?>
-                        <a href="<?= $arrButton['href'] ?>"><img src="<?= $arrButton['icon'] ?>" alt="<?= $arrButton['label'] ?>"></a>
+                        <a href="<?= $arrButton['href'] ?>"<?= $arrButton['attributes'] ?>><img src="<?= $arrButton['icon'] ?>" alt="<?= $arrButton['label'] ?>"></a>
                     <?php endforeach; ?>
                 </td>
             </tr>
