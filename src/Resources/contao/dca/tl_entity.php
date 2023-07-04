@@ -121,7 +121,7 @@ $GLOBALS['TL_DCA']['tl_entity'] = [
             'save_callback' => [
                 function ($strStatusId, \DataContainer $dataContainer) {
                     if ($strStatusId && $dataContainer->activeRecord->status !== $strStatusId) {
-                        (new \Alnv\FrontendEditingBundle\Library\States())->changeState($dataContainer->activeRecord->id, $dataContainer->activeRecord->status);
+                        (new \Alnv\FrontendEditingBundle\Library\States())->changeState($dataContainer->activeRecord->id, $strStatusId);
                     }
                     return $strStatusId;
                 }
