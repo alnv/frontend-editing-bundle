@@ -131,7 +131,6 @@
                 objXHttp.open('POST', '/dropzone/remove/'+objResponse.file.uuid, true);
                 objXHttp.send();
                 removeUpload(objResponse.file.uuid)
-
             });
 
             let arrDeleteFiles = document.querySelectorAll("#id_list_<?= $this->id ?> button.delete");
