@@ -17,7 +17,7 @@ class FeNotification {
         $this->setFormTokens($strEntityId, $arrTokens);
         $this->setMemberTokens($arrTokens);
         $objNotification = \NotificationCenter\Model\Notification::findByPk($strNotificationId);
-        if (!$objNotification) {
+        if ($objNotification) {
             $objNotification->send($arrTokens);
         }
     }
