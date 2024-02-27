@@ -2,21 +2,17 @@
 
 namespace Alnv\FrontendEditingBundle\Controller;
 
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Contao\CoreBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Routing\Annotation\Route;
 
-/**
- *
- * @Route("/dropzone", defaults={"_scope"="frontend", "_token_check"=false})
- */
-class UploadController extends AbstractController {
+#[Route(path: 'dropzone', name: 'upload-controller', defaults: ['_scope' => 'frontend'])]
+class UploadController extends AbstractController
+{
 
-    /**
-     *
-     * @Route("/upload/{id}", name="dropzone-upload")
-     * @Method({"POST"})
-     */
-    public function upload($id) {
+    #[Route(path: '/upload/{id}', methods: ["POST"])]
+    public function upload($id): JsonResponse
+    {
 
         $this->container->get('contao.framework')->initialize();
 
@@ -32,7 +28,7 @@ class UploadController extends AbstractController {
             return new JsonResponse($arrResponse);
         }
 
-        if ($objField->multiple && count($this->getUploadsParam()) >= (int) $objField->mSize) {
+        if ($objField->multiple && count($this->getUploadsParam()) >= (int)$objField->mSize) {
             $arrResponse['error'] = $GLOBALS['TL_LANG']['MSC']['uploadLimit'];
             return new JsonResponse($arrResponse);
         }
@@ -56,12 +52,9 @@ class UploadController extends AbstractController {
         return new JsonResponse($arrResponse);
     }
 
-    /**
-     *
-     * @Route("/file/title", name="dropzone-changeMetaTitle")
-     * @Method({"POST"})
-     */
-    public function changeMetaTitle() {
+    #[Route(path: '/file/title', methods: ["POST"])]
+    public function changeMetaTitle(): JsonResponse
+    {
 
         $this->container->get('contao.framework')->initialize();
 
@@ -84,12 +77,9 @@ class UploadController extends AbstractController {
         return new JsonResponse(['done' => true, 'meta' => $arrMeta]);
     }
 
-    /**
-     *
-     * @Route("/remove/{uuid}", name="dropzone-remove")
-     * @Method({"POST"})
-     */
-    public function remove($uuid) {
+    #[Route(path: '/remove/{uuid}', methods: ["POST"])]
+    public function remove($uuid): JsonResponse
+    {
 
         $objFile = \FilesModel::findByUuid($uuid);
         if ($objFile) {
@@ -100,7 +90,8 @@ class UploadController extends AbstractController {
         return new JsonResponse([]);
     }
 
-    protected function clearUploads($objField) {
+    protected function clearUploads($objField)
+    {
 
         $varUploads = $this->getUploadsParam();
         if (!$objField->multiple && !empty($varUploads)) {
@@ -114,16 +105,18 @@ class UploadController extends AbstractController {
         }
     }
 
-    protected function getUploadsParam() {
+    protected function getUploadsParam()
+    {
 
         $varUploads = \Input::post('uploads');
         if (!is_array($varUploads) && !empty($varUploads)) {
             $varUploads = [$varUploads];
         }
-        return ($varUploads?$varUploads:[]);
+        return ($varUploads ? $varUploads : []);
     }
 
-    protected function getUpload($strName) {
+    protected function getUpload($strName)
+    {
 
         $arrUpload = $_SESSION['FILES'][$strName];
         $objFile = \FilesModel::findByUuid($_SESSION['FILES'][$strName]['uuid']);
