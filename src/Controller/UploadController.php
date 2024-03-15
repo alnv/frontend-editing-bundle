@@ -3,6 +3,7 @@
 namespace Alnv\FrontendEditingBundle\Controller;
 
 use Contao\CoreBundle\Controller\AbstractController;
+use Contao\System;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use Contao\FormFieldModel;
@@ -87,9 +88,10 @@ class UploadController extends AbstractController
     {
 
         $objFile = FilesModel::findByUuid($uuid);
+        $strRootDir = System::getContainer()->getParameter('kernel.project_dir');
 
         if ($objFile) {
-            unlink(TL_ROOT . '/' . $objFile->path);
+            unlink($strRootDir . '/' . $objFile->path);
             $objFile->delete();
         }
 
@@ -99,15 +101,13 @@ class UploadController extends AbstractController
     protected function clearUploads($objField)
     {
 
+        $strRootDir = System::getContainer()->getParameter('kernel.project_dir');
         $varUploads = $this->getUploadsParam();
         if (!$objField->multiple && !empty($varUploads)) {
-
             foreach ($varUploads as $strUuid) {
-
                 $objFile = FilesModel::findByUuid($strUuid);
-
                 if ($objFile) {
-                    unlink(TL_ROOT . '/' . $objFile->path);
+                    unlink($strRootDir . '/' . $objFile->path);
                     $objFile->delete();
                 }
             }
@@ -118,7 +118,6 @@ class UploadController extends AbstractController
     {
 
         $varUploads = Input::post('uploads');
-
         if (!is_array($varUploads) && !empty($varUploads)) {
             $varUploads = [$varUploads];
         }
