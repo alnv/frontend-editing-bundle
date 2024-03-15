@@ -2,12 +2,14 @@
 
 namespace Alnv\FrontendEditingBundle\Inserttags;
 
-class IgnoreTags {
+class IgnoreTags
+{
 
-    public function replace($strFragments) {
+    public function replace($strFragments)
+    {
 
         if (in_array($strFragments, ['filesize', 'maxFilesize', 'statusCode'])) {
-            return '{{'.$strFragments.'}}';
+            return '{{' . $strFragments . '}}';
         }
 
         return false;

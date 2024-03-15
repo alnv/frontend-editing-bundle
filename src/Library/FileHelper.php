@@ -2,11 +2,24 @@
 
 namespace Alnv\FrontendEditingBundle\Library;
 
-class FileHelper {
+use Contao\Input;
+use Contao\Controller;
+use Contao\System;
+use Contao\Frontend;
+use Contao\StringUtil;
+use Contao\Environment;
+use Contao\FilesModel;
+use Contao\Config;
+use Contao\File;
+use Contao\Image;
 
-    public static function sendFileToBrowser() {
+class FileHelper
+{
 
-        $strFile = \Input::get('file');
+    public static function sendFileToBrowser()
+    {
+
+        $strFile = Input::get('file');
 
         if (!$strFile) {
             return null;
@@ -23,51 +36,54 @@ class FileHelper {
                         (new $arrCallback[0])->{$arrCallback[1]}($strFile);
                     }
                 }
-                \Controller::sendFileToBrowser($strFile);
+                Controller::sendFileToBrowser($strFile);
             }
         }
     }
 
-    public static function getCurrentLanguage() {
+    public static function getCurrentLanguage()
+    {
 
-        $objContainer = \System::getContainer();
+        $objContainer = System::getContainer();
 
         return $objContainer->get('request_stack')->getCurrentRequest()->getLocale();
     }
 
-    public static function getMeta($strMeta, $objFile) {
+    public static function getMeta($strMeta, $objFile)
+    {
 
-        $arrMeta = \Frontend::getMetaData($strMeta, static::getCurrentLanguage());
+        $arrMeta = Frontend::getMetaData($strMeta, static::getCurrentLanguage());
 
         if ($arrMeta['title'] == '') {
-            $arrMeta['title'] = \StringUtil::specialchars($objFile->basename);
+            $arrMeta['title'] = StringUtil::specialchars($objFile->basename);
         }
 
         return $arrMeta;
     }
 
-    public static function getFiles($strUuids, $arrOrder) {
+    public static function getFiles($strUuids, $arrOrder)
+    {
 
         $arrFiles = [];
-        $arrValues = \StringUtil::deserialize($strUuids, true);
-        $objFiles = \FilesModel::findMultipleByUuids($arrValues);
+        $arrValues = StringUtil::deserialize($strUuids, true);
+        $objFiles = FilesModel::findMultipleByUuids($arrValues);
 
         if ($objFiles === null) {
             return $arrFiles;
         }
 
-        $objContainer = \System::getContainer();
-        $allowedDownload = \StringUtil::trimsplit(',', strtolower(\Config::get('allowedDownload')));
+        // $objContainer = System::getContainer();
+        $allowedDownload = StringUtil::trimsplit(',', strtolower(Config::get('allowedDownload')));
 
         while ($objFiles->next()) {
 
-            if ( isset($arrFiles[$objFiles->path]) || !file_exists(\System::getContainer()->getParameter('kernel.project_dir') . '/' . $objFiles->path)) {
+            if (isset($arrFiles[$objFiles->path]) || !file_exists(System::getContainer()->getParameter('kernel.project_dir') . '/' . $objFiles->path)) {
                 continue;
             }
 
             if ($objFiles->type == 'file') {
 
-                $objFile = new \File($objFiles->path);
+                $objFile = new File($objFiles->path);
 
                 if (!\in_array($objFile->extension, $allowedDownload) || preg_match('/^meta(_[a-z]{2})?\.txt$/', $objFile->basename)) {
                     continue;
@@ -76,34 +92,35 @@ class FileHelper {
                 $GLOBALS['DOWNLOADABLE-FILES'][] = $objFiles->path;
                 $arrMeta = static::getMeta($objFiles->meta, $objFiles);
 
-                $strHref = \Environment::get('request');
+                $strHref = Environment::get('request');
                 if (isset($_GET['file'])) {
                     $strHref = preg_replace('/(&(amp;)?|\?)file=[^&]+/', '', $strHref);
                 }
                 if (isset($_GET['cid'])) {
                     $strHref = preg_replace('/(&(amp;)?|\?)cid=\d+/', '', $strHref);
                 }
-                $strHref .= (strpos($strHref, '?') !== false ? '&amp;' : '?') . 'file=' . \System::urlEncode($objFiles->path);
+
+                $strHref .= (strpos($strHref, '?') !== false ? '&amp;' : '?') . 'file=' . System::urlEncode($objFiles->path);
 
                 $arrFiles[$objFiles->path] = [
                     'id' => $objFiles->id,
-                    'uuid' => \StringUtil::binToUuid($objFiles->uuid),
+                    'uuid' => StringUtil::binToUuid($objFiles->uuid),
                     'name' => $objFile->basename,
-                    'title' => \StringUtil::specialchars(sprintf($GLOBALS['TL_LANG']['MSC']['download'], $objFile->basename)),
+                    'title' => StringUtil::specialchars(sprintf($GLOBALS['TL_LANG']['MSC']['download'], $objFile->basename)),
                     'link' => $arrMeta['title'],
                     'caption' => $arrMeta['caption'],
                     'href' => $strHref,
-                    'icon' => \Image::getPath($objFile->icon),
+                    'icon' => Image::getPath($objFile->icon),
                     'mime' => $objFile->mime,
                     'meta' => $arrMeta,
                     'extension' => $objFile->extension,
                     'path' => $objFile->dirname,
                     'urlpath' => $objFile->path,
-                    'filesize'  => \Controller::getReadableSize($objFile->filesize)
+                    'filesize' => Controller::getReadableSize($objFile->filesize)
                 ];
             } else {
 
-                $objSubfiles = \FilesModel::findByPid($objFiles->uuid, ['order' => 'name']);
+                $objSubfiles = FilesModel::findByPid($objFiles->uuid, ['order' => 'name']);
 
                 if ($objSubfiles === null) {
                     continue;
@@ -115,7 +132,7 @@ class FileHelper {
                         continue;
                     }
 
-                    $objFile = new \File($objSubfiles->path);
+                    $objFile = new File($objSubfiles->path);
                     $GLOBALS['DOWNLOADABLE-FILES'][] = $objFiles->path;
 
                     if (!\in_array($objFile->extension, $allowedDownload) || preg_match('/^meta(_[a-z]{2})?\.txt$/', $objFile->basename)) {
@@ -123,22 +140,22 @@ class FileHelper {
                     }
 
                     $arrMeta = static::getMeta($objSubfiles->meta, $objFile);
-                    $strHref = \Environment::get('request');
+                    $strHref = Environment::get('request');
                     if (preg_match('/(&(amp;)?|\?)file=/', $strHref)) {
                         $strHref = preg_replace('/(&(amp;)?|\?)file=[^&]+/', '', $strHref);
                     }
-                    $strHref .= (strpos($strHref, '?') !== false ? '&amp;' : '?') . 'file=' . \System::urlEncode($objSubfiles->path);
+                    $strHref .= (strpos($strHref, '?') !== false ? '&amp;' : '?') . 'file=' . System::urlEncode($objSubfiles->path);
 
                     $arrFiles[$objSubfiles->path] = [
                         'id' => $objSubfiles->id,
-                        'uuid' => \StringUtil::binToUuid($objSubfiles->uuid),
+                        'uuid' => StringUtil::binToUuid($objSubfiles->uuid),
                         'name' => $objFile->basename,
-                        'title' => \StringUtil::specialchars(sprintf($GLOBALS['TL_LANG']['MSC']['download'], $objFile->basename)),
+                        'title' => StringUtil::specialchars(sprintf($GLOBALS['TL_LANG']['MSC']['download'], $objFile->basename)),
                         'link' => $arrMeta['title'],
                         'caption' => $arrMeta['caption'],
                         'href' => $strHref,
-                        'filesize' => \Controller::getReadableSize($objFile->filesize),
-                        'icon' => \Image::getPath($objFile->icon),
+                        'filesize' => Controller::getReadableSize($objFile->filesize),
+                        'icon' => Image::getPath($objFile->icon),
                         'mime' => $objFile->mime,
                         'meta' => $arrMeta,
                         'extension' => $objFile->extension,
@@ -151,7 +168,7 @@ class FileHelper {
         if (!empty($arrOrder)) {
             $_arrFiles = [];
             foreach ($arrOrder as $strUuid) {
-                $objFile = \FilesModel::findByUuid($strUuid);
+                $objFile = FilesModel::findByUuid($strUuid);
                 if (!$objFile) {
                     continue;
                 }

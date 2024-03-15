@@ -2,9 +2,14 @@
 
 namespace Alnv\FrontendEditingBundle\Library;
 
-class Helpers {
+use Contao\StringUtil;
+use Contao\Validator;
 
-    public static function makeArrayReadable($arrArray) {
+class Helpers
+{
+
+    public static function makeArrayReadable($arrArray): string
+    {
 
         $strValue = json_encode($arrArray);
         $strValue = str_replace('"', '', $strValue);
@@ -14,26 +19,29 @@ class Helpers {
         $strValue = str_replace('}', '', $strValue);
         $strValue = str_replace('"', '', $strValue);
         $strValue = str_replace(',', '<br>', $strValue);
-        $strValue = str_replace(':', ': ', $strValue);
 
-        return $strValue;
+        return str_replace(':', ': ', $strValue);
     }
 
-    public static function getDropzoneValue($varValue) {
+    public static function getDropzoneValue($varValue): array
+    {
 
+        $arrReturn = [];
         $arrFiles = [];
+
         if (is_string($varValue) && $varValue) {
             $arrFiles = [$varValue];
         }
+
         if (is_array($varValue) && !empty($varValue)) {
             $arrFiles = $varValue;
         }
 
-        $arrReturn = [];
         foreach ($arrFiles as $strValue) {
-            if (\Validator::isBinaryUuid($strValue)) {
-                $arrReturn[] = \StringUtil::binToUuid($strValue);
-            } elseif (\Validator::isUuid($strValue)) {
+
+            if (Validator::isBinaryUuid($strValue)) {
+                $arrReturn[] = StringUtil::binToUuid($strValue);
+            } elseif (Validator::isUuid($strValue)) {
                 $arrReturn[] = $strValue;
             }
         }

@@ -2,4 +2,8 @@
 
 namespace Alnv\FrontendEditingBundle;
 
-class AlnvFrontendEditingBundle extends \Symfony\Component\HttpKernel\Bundle\Bundle {}
+use Symfony\Component\HttpKernel\Bundle\Bundle;
+
+class AlnvFrontendEditingBundle extends Bundle
+{
+}

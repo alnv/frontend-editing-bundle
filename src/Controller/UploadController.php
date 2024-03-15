@@ -5,6 +5,10 @@ namespace Alnv\FrontendEditingBundle\Controller;
 use Contao\CoreBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
+use Contao\FormFieldModel;
+use Contao\Input;
+use Contao\FilesModel;
+use Contao\StringUtil;
 
 #[Route(path: 'dropzone', name: 'upload-controller', defaults: ['_scope' => 'frontend'])]
 class UploadController extends AbstractController
@@ -21,7 +25,7 @@ class UploadController extends AbstractController
             'error' => ''
         ];
 
-        $objField = \FormFieldModel::findByPk($id);
+        $objField = FormFieldModel::findByPk($id);
 
         if (!$objField) {
             $arrResponse['error'] = $GLOBALS['TL_LANG']['MSC']['uploadMessageTryAgain'];
@@ -33,12 +37,12 @@ class UploadController extends AbstractController
             return new JsonResponse($arrResponse);
         }
 
-        $arrAttribute = \FormFileUpload::getAttributesFromDca([
+        $arrAttribute = FormFileUpload::getAttributesFromDca([
             'inputType' => 'fileTree',
             'eval' => $objField->row(),
         ], $objField->name, null, $objField->name);
 
-        $objUpload = new \FormFileUpload($arrAttribute);
+        $objUpload = new FormFileUpload($arrAttribute);
         $objUpload->validate();
 
         if ($objUpload->hasErrors()) {
@@ -58,18 +62,19 @@ class UploadController extends AbstractController
 
         $this->container->get('contao.framework')->initialize();
 
-        $objFile = \FilesModel::findByUuid(\Input::post('uuid'));
+        $objFile = FilesModel::findByUuid(Input::post('uuid'));
 
-        if (!$objFile || !\Input::post('language')) {
+        if (!$objFile || !Input::post('language')) {
             return new JsonResponse(['done' => false]);
         }
 
-        $arrMeta = \StringUtil::deserialize($objFile->meta, true);
-        if (!isset($arrMeta[\Input::post('language')])) {
-            $arrMeta[\Input::post('language')] = [];
+        $arrMeta = StringUtil::deserialize($objFile->meta, true);
+
+        if (!isset($arrMeta[Input::post('language')])) {
+            $arrMeta[Input::post('language')] = [];
         }
 
-        $arrMeta[\Input::post('language')]['title'] = \Input::post('title') ?: '';
+        $arrMeta[Input::post('language')]['title'] = Input::post('title') ?: '';
 
         $objFile->meta = serialize($arrMeta);
         $objFile->save();
@@ -81,7 +86,8 @@ class UploadController extends AbstractController
     public function remove($uuid): JsonResponse
     {
 
-        $objFile = \FilesModel::findByUuid($uuid);
+        $objFile = FilesModel::findByUuid($uuid);
+
         if ($objFile) {
             unlink(TL_ROOT . '/' . $objFile->path);
             $objFile->delete();
@@ -95,8 +101,11 @@ class UploadController extends AbstractController
 
         $varUploads = $this->getUploadsParam();
         if (!$objField->multiple && !empty($varUploads)) {
+
             foreach ($varUploads as $strUuid) {
-                $objFile = \FilesModel::findByUuid($strUuid);
+
+                $objFile = FilesModel::findByUuid($strUuid);
+
                 if ($objFile) {
                     unlink(TL_ROOT . '/' . $objFile->path);
                     $objFile->delete();
@@ -108,18 +117,21 @@ class UploadController extends AbstractController
     protected function getUploadsParam()
     {
 
-        $varUploads = \Input::post('uploads');
+        $varUploads = Input::post('uploads');
+
         if (!is_array($varUploads) && !empty($varUploads)) {
             $varUploads = [$varUploads];
         }
-        return ($varUploads ? $varUploads : []);
+
+        return ($varUploads ?: []);
     }
 
     protected function getUpload($strName)
     {
 
         $arrUpload = $_SESSION['FILES'][$strName];
-        $objFile = \FilesModel::findByUuid($_SESSION['FILES'][$strName]['uuid']);
+        $objFile = FilesModel::findByUuid($_SESSION['FILES'][$strName]['uuid']);
+
         if ($objFile) {
             $arrUpload['path'] = $objFile->path;
         }

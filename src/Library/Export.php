@@ -2,26 +2,39 @@
 
 namespace Alnv\FrontendEditingBundle\Library;
 
+use Contao\System;
+use Contao\StringUtil;
+use Contao\FilesModel;
+use Contao\Environment;
+use Contao\Database;
+use Contao\FormModel;
+use Contao\FrontendUser;
+use Contao\BackendUser;
+use Contao\MemberModel;
+use Contao\FormFieldModel;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
-class Export extends \System {
+class Export extends System
+{
 
-    public function __construct() {
+    public function __construct()
+    {
 
         parent::__construct();
     }
 
-    public function parseValue($strValue, $objField) {
+    public function parseValue($strValue, $objField)
+    {
 
         switch ($objField->type) {
             case 'dropzone':
                 $arrFiles = [];
-                $varValue = \StringUtil::deserialize($strValue);
+                $varValue = StringUtil::deserialize($strValue);
                 if (is_array($varValue)) {
                     foreach ($varValue as $strUuid) {
-                        if ($objFile = \FilesModel::findByUuid($strUuid)) {
-                            $arrFiles[] = \Environment::get('url') . '/' . $objFile->path;
+                        if ($objFile = FilesModel::findByUuid($strUuid)) {
+                            $arrFiles[] = Environment::get('url') . '/' . $objFile->path;
                         }
                     }
                 }
@@ -32,24 +45,25 @@ class Export extends \System {
         return $strValue;
     }
 
-    public function download($strEntityGroupId, $strPath='', $arrOnly=[]) {
+    public function download($strEntityGroupId, $strPath = '', $arrOnly = [])
+    {
 
-        $objEntityGroup = \Database::getInstance()->prepare('SELECT * FROM tl_entity_group WHERE id=?')->limit(1)->execute($strEntityGroupId);
+        $objEntityGroup = Database::getInstance()->prepare('SELECT * FROM tl_entity_group WHERE id=?')->limit(1)->execute($strEntityGroupId);
 
         if (!$objEntityGroup->numRows) {
             return null;
         }
 
-        $objForm = \FormModel::findByPk($objEntityGroup->form);
+        $objForm = FormModel::findByPk($objEntityGroup->form);
 
         if (!$objForm) {
             return null;
         }
 
         if (TL_MODE == 'FE') {
-            $strUser = \FrontendUser::getInstance()->username;
+            $strUser = FrontendUser::getInstance()->username;
         } else {
-            $strUser = \BackendUser::getInstance()->email;
+            $strUser = BackendUser::getInstance()->email;
         }
 
         $objSpreadsheet = new Spreadsheet();
@@ -61,7 +75,7 @@ class Export extends \System {
         $objSheet = $objSpreadsheet->getActiveSheet();
 
         $arrRows = [];
-        $objEntities = \Database::getInstance()->prepare('SELECT * FROM tl_entity WHERE pid=? ORDER BY sorting')->execute($objEntityGroup->id);
+        $objEntities = Database::getInstance()->prepare('SELECT * FROM tl_entity WHERE pid=? ORDER BY sorting')->execute($objEntityGroup->id);
 
         while ($objEntities->next()) {
 
@@ -72,20 +86,20 @@ class Export extends \System {
             }
 
             $arrEntity = [];
-            $objValues = \Database::getInstance()->prepare('SELECT * FROM tl_entity_value WHERE pid=?')->execute($objEntities->id);
-            if ($objMember = \MemberModel::findByPk($objEntities->member)) {
+            $objValues = Database::getInstance()->prepare('SELECT * FROM tl_entity_value WHERE pid=?')->execute($objEntities->id);
+            if ($objMember = MemberModel::findByPk($objEntities->member)) {
                 $arrEntity['Mitglied'] = $objMember->email;
             }
 
             while ($objValues->next()) {
-                $objFormField = \FormFieldModel::findByPk($objValues->field);
+                $objFormField = FormFieldModel::findByPk($objValues->field);
                 if (!$objFormField) {
                     continue;
                 }
-                $arrEntity[($objFormField->label?:$objFormField->name)] = $this->parseValue($objValues->varValue, $objFormField);
+                $arrEntity[($objFormField->label ?: $objFormField->name)] = $this->parseValue($objValues->varValue, $objFormField);
             }
 
-            $objState = \Database::getInstance()->prepare('SELECT * FROM tl_states WHERE id=?')->limit(1)->execute($objEntities->status);
+            $objState = Database::getInstance()->prepare('SELECT * FROM tl_states WHERE id=?')->limit(1)->execute($objEntities->status);
             $arrEntity['Status'] = $objState->name ?: '-';
 
             $arrRows[] = $arrEntity;
@@ -105,7 +119,7 @@ class Export extends \System {
         $arrFields = array_keys($arrRows[0]);
 
         foreach ($arrFields as $numCols => $strField) {
-            $objSheet->setCellValueByColumnAndRow($numCols+1, 1, $strField);
+            $objSheet->setCellValueByColumnAndRow($numCols + 1, 1, $strField);
         }
 
         $numRows = 2;

@@ -2,33 +2,47 @@
 
 namespace Alnv\FrontendEditingBundle\Library;
 
-class FeNotification {
+use Contao\Config;
+use Contao\Database;
+use Contao\FilesModel;
+use Contao\FormFieldModel;
+use Contao\FrontendUser;
+use Contao\MemberModel;
+use Contao\StringUtil;
+use Contao\Validator;
+use NotificationCenter\Model\Notification;
 
-    public function send($strNotificationId, $strEntityId) {
+class FeNotification
+{
+
+    public function send($strNotificationId, $strEntityId)
+    {
 
         if (!$strNotificationId) {
             return;
         }
 
         $arrTokens = [
-            'admin_email' => \Config::get('adminEmail')
+            'admin_email' => Config::get('adminEmail')
         ];
 
         $this->setFormTokens($strEntityId, $arrTokens);
         $this->setMemberTokens($arrTokens);
-        $objNotification = \NotificationCenter\Model\Notification::findByPk($strNotificationId);
+        $objNotification = Notification::findByPk($strNotificationId);
+
         if ($objNotification) {
             $objNotification->send($arrTokens);
         }
     }
 
-    protected function setFormTokens($strEntityId, &$arrTokens) {
+    protected function setFormTokens($strEntityId, &$arrTokens)
+    {
 
-        $objValues = \Database::getInstance()->prepare('SELECT * FROM tl_entity_value WHERE pid=?')->execute($strEntityId);
+        $objValues = Database::getInstance()->prepare('SELECT * FROM tl_entity_value WHERE pid=?')->execute($strEntityId);
 
         while ($objValues->next()) {
 
-            $objField = \FormFieldModel::findByPk($objValues->field);
+            $objField = FormFieldModel::findByPk($objValues->field);
 
             if (!$objField) {
                 continue;
@@ -38,44 +52,49 @@ class FeNotification {
                 continue;
             }
 
-            $varValues = \StringUtil::deserialize($objValues->varValue);
+            $varValues = StringUtil::deserialize($objValues->varValue);
+
             if (is_array($varValues)) {
                 $arrValues = [];
                 foreach ($varValues as $strValue) {
+
                     if (is_array($strValue)) {
-                        $strValue = (\Alnv\FrontendEditingBundle\Library\Helpers::makeArrayReadable($strValue));
+                        $strValue = (Helpers::makeArrayReadable($strValue));
                     }
-                    if (\Validator::isUuid($strValue) || \Validator::isBinaryUuid($strValue)) {
-                        if ($objFile = \FilesModel::findByUuid($strValue)) {
+
+                    if (Validator::isUuid($strValue) || Validator::isBinaryUuid($strValue)) {
+                        if ($objFile = FilesModel::findByUuid($strValue)) {
                             $strValue = $objFile->path;
                         }
                     }
+
                     $arrValues[] = $strValue;
                 }
                 $varValues = implode(', ', $arrValues);
             }
 
-            $arrTokens['form_'.$objField->name] = $varValues;
+            $arrTokens['form_' . $objField->name] = $varValues;
         }
     }
 
-    protected function setMemberTokens(&$arrTokens, $strMemberId=null) {
+    protected function setMemberTokens(&$arrTokens, $strMemberId = null)
+    {
 
         if (!$strMemberId) {
-            $strMemberId = \FrontendUser::getInstance()->id;
+            $strMemberId = FrontendUser::getInstance()->id;
         }
 
         if (!$strMemberId) {
             return null;
         }
 
-        $objMember = \MemberModel::findByPk($strMemberId);
+        $objMember = MemberModel::findByPk($strMemberId);
         if (!$objMember) {
             return null;
         }
 
         foreach ($objMember->row() as $strField => $strValue) {
-            $arrTokens['member_'.$strField] = $strValue;
+            $arrTokens['member_' . $strField] = $strValue;
         }
     }
 }
