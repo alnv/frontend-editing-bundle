@@ -2,7 +2,9 @@
 
 namespace Alnv\FrontendEditingBundle\Library;
 
+use Contao\ContentModel;
 use Contao\System;
+use Contao\Form AS ContaoForm;
 use Contao\Controller;
 use Contao\FormFieldModel;
 use Contao\Input;
@@ -31,11 +33,17 @@ class Form extends System
             }
         }
 
-        if (isset($GLOBALS['TL_HOOKS']['compileFormFields']) && is_array($GLOBALS['TL_HOOKS']['compileFormFields'])) {
-            foreach ($GLOBALS['TL_HOOKS']['compileFormFields'] as $callback) {
-                $this->import($callback[0]);
-                $arrFields = $this->{$callback[0]}->{$callback[1]}($arrFields, $strFormId, $this);
+        $objContentEntity = Database::getInstance()->prepare('SELECT * FROM tl_content WHERE type=?')->limit(1)->execute('frontend_editing');
+        if ($objContentEntity->forms) {
+            $objContentElement = ContentModel::findByPk($objContentEntity->id);
+            $objForm = new ContaoForm($objContentElement);
+            if (isset($GLOBALS['TL_HOOKS']['compileFormFields']) && is_array($GLOBALS['TL_HOOKS']['compileFormFields'])) {
+                foreach ($GLOBALS['TL_HOOKS']['compileFormFields'] as $callback) {
+                    $this->import($callback[0]);
+                    $arrFields = $this->{$callback[0]}->{$callback[1]}($arrFields, $strFormId, $objForm);
+                }
             }
+
         }
 
         return $arrFields;

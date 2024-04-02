@@ -98,7 +98,7 @@ class UploadController extends AbstractController
         return new JsonResponse([]);
     }
 
-    protected function clearUploads($objField)
+    protected function clearUploads($objField): void
     {
 
         $strRootDir = System::getContainer()->getParameter('kernel.project_dir');
