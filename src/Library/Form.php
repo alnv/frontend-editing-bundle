@@ -115,7 +115,7 @@ class Form extends System
         return $arrReturn;
     }
 
-    public function getEntityByAlias($strAlias)
+    public function getEntityByAlias($strAlias): array|null
     {
 
         $objEntity = Database::getInstance()->prepare('SELECT * FROM tl_entity WHERE alias=?')->limit(1)->execute($strAlias);
@@ -212,7 +212,6 @@ class Form extends System
 
     public function setStatus($strStatusID, $strEntityId): void
     {
-
         (new States())->changeState($strEntityId, $strStatusID);
     }
 }

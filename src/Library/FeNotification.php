@@ -28,6 +28,7 @@ class FeNotification
 
         $this->setFormTokens($strEntityId, $arrTokens);
         $this->setMemberTokens($arrTokens);
+
         $objNotification = Notification::findByPk($strNotificationId);
 
         if ($objNotification) {

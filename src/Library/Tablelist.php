@@ -43,7 +43,7 @@ class Tablelist
             }
 
             $arrSet['status'] = (new DataContainer())->getStatus($arrSet['status']);
-            $arrSet['title'] = $arrSettings['titleColumn'] ? StringUtil::parseSimpleTokens($arrSettings['titleColumn'], $this->getFormTokens($arrValues)) : '';
+            $arrSet['title'] = $arrSettings['titleColumn'] ? Helpers::parseSimpleTokens($arrSettings['titleColumn'], $this->getFormTokens($arrValues)) : '';
             $arrSet['values'] = $arrValues;
             $arrSet['buttons'] = $this->getButtons($arrSet);
             $arrSet['updated_at'] = (new Date($arrSet['stamp']))->datim;

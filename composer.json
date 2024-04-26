@@ -30,7 +30,6 @@
     "terminal42/dcawizard": "^3.0",
     "phpoffice/phpspreadsheet": "~1.29 || ~2.0",
     "contao/core-bundle": "~4.13 || ~5.0",
-    "terminal42/notification_center": "~1.7 || ~2.0",
     "menatwork/contao-multicolumnwizard-bundle": "^3.6"
   },
   "config": {

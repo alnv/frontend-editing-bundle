@@ -12,7 +12,7 @@ class FormDropzoneUpload extends Widget
     protected $strTemplate = 'form_dropzone';
     protected $strPrefix = 'widget widget-dropzone';
 
-    public function validate()
+    public function validate(): void
     {
 
         $varValue = $this->validator($this->getPost($this->strName));

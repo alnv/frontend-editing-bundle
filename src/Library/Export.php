@@ -60,7 +60,7 @@ class Export extends System
             return null;
         }
 
-        if (TL_MODE == 'FE') {
+        if (Helpers::get() == 'FE') {
             $strUser = FrontendUser::getInstance()->username;
         } else {
             $strUser = BackendUser::getInstance()->email;

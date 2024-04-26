@@ -3,13 +3,13 @@
 namespace Alnv\FrontendEditingBundle\Controller;
 
 use Contao\CoreBundle\Controller\AbstractController;
-use Contao\System;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
-use Contao\FormFieldModel;
 use Contao\Input;
+use Contao\System;
 use Contao\FilesModel;
 use Contao\StringUtil;
+use Contao\FormFieldModel;
 
 #[Route(path: 'dropzone', name: 'upload-controller', defaults: ['_scope' => 'frontend'])]
 class UploadController extends AbstractController
@@ -98,7 +98,7 @@ class UploadController extends AbstractController
         return new JsonResponse([]);
     }
 
-    protected function clearUploads($objField)
+    protected function clearUploads($objField): void
     {
 
         $strRootDir = System::getContainer()->getParameter('kernel.project_dir');
@@ -114,7 +114,7 @@ class UploadController extends AbstractController
         }
     }
 
-    protected function getUploadsParam()
+    protected function getUploadsParam(): array
     {
 
         $varUploads = Input::post('uploads');
@@ -125,7 +125,7 @@ class UploadController extends AbstractController
         return ($varUploads ?: []);
     }
 
-    protected function getUpload($strName)
+    protected function getUpload($strName): array
     {
 
         $arrUpload = $_SESSION['FILES'][$strName];

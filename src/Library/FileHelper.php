@@ -2,20 +2,19 @@
 
 namespace Alnv\FrontendEditingBundle\Library;
 
-use Contao\Input;
-use Contao\Controller;
-use Contao\System;
-use Contao\Frontend;
-use Contao\StringUtil;
-use Contao\Environment;
-use Contao\FilesModel;
 use Contao\Config;
+use Contao\Controller;
+use Contao\Environment;
 use Contao\File;
+use Contao\FilesModel;
+use Contao\Frontend;
 use Contao\Image;
+use Contao\Input;
+use Contao\StringUtil;
+use Contao\System;
 
 class FileHelper
 {
-
     public static function sendFileToBrowser()
     {
 
@@ -49,7 +48,7 @@ class FileHelper
         return $objContainer->get('request_stack')->getCurrentRequest()->getLocale();
     }
 
-    public static function getMeta($strMeta, $objFile)
+    public static function getMeta($strMeta, $objFile): array
     {
 
         $arrMeta = Frontend::getMetaData($strMeta, static::getCurrentLanguage());
@@ -61,7 +60,7 @@ class FileHelper
         return $arrMeta;
     }
 
-    public static function getFiles($strUuids, $arrOrder)
+    public static function getFiles($strUuids, $arrOrder): array
     {
 
         $arrFiles = [];
@@ -72,8 +71,8 @@ class FileHelper
             return $arrFiles;
         }
 
-        // $objContainer = System::getContainer();
-        $allowedDownload = StringUtil::trimsplit(',', strtolower(Config::get('allowedDownload')));
+        $strHref = Environment::get('request');
+        $arrAllowedDownload = StringUtil::trimsplit(',', strtolower(Config::get('allowedDownload')));
 
         while ($objFiles->next()) {
 
@@ -85,14 +84,13 @@ class FileHelper
 
                 $objFile = new File($objFiles->path);
 
-                if (!\in_array($objFile->extension, $allowedDownload) || preg_match('/^meta(_[a-z]{2})?\.txt$/', $objFile->basename)) {
+                if (!\in_array($objFile->extension, $arrAllowedDownload) || preg_match('/^meta(_[a-z]{2})?\.txt$/', $objFile->basename)) {
                     continue;
                 }
 
                 $GLOBALS['DOWNLOADABLE-FILES'][] = $objFiles->path;
                 $arrMeta = static::getMeta($objFiles->meta, $objFiles);
 
-                $strHref = Environment::get('request');
                 if (isset($_GET['file'])) {
                     $strHref = preg_replace('/(&(amp;)?|\?)file=[^&]+/', '', $strHref);
                 }
@@ -135,15 +133,16 @@ class FileHelper
                     $objFile = new File($objSubfiles->path);
                     $GLOBALS['DOWNLOADABLE-FILES'][] = $objFiles->path;
 
-                    if (!\in_array($objFile->extension, $allowedDownload) || preg_match('/^meta(_[a-z]{2})?\.txt$/', $objFile->basename)) {
+                    if (!\in_array($objFile->extension, $arrAllowedDownload) || preg_match('/^meta(_[a-z]{2})?\.txt$/', $objFile->basename)) {
                         continue;
                     }
 
                     $arrMeta = static::getMeta($objSubfiles->meta, $objFile);
-                    $strHref = Environment::get('request');
+
                     if (preg_match('/(&(amp;)?|\?)file=/', $strHref)) {
                         $strHref = preg_replace('/(&(amp;)?|\?)file=[^&]+/', '', $strHref);
                     }
+
                     $strHref .= (strpos($strHref, '?') !== false ? '&amp;' : '?') . 'file=' . System::urlEncode($objSubfiles->path);
 
                     $arrFiles[$objSubfiles->path] = [
