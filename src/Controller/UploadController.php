@@ -8,6 +8,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Contao\Input;
 use Contao\System;
 use Contao\FilesModel;
+use Contao\FormUpload;
 use Contao\StringUtil;
 use Contao\FormFieldModel;
 
@@ -38,12 +39,12 @@ class UploadController extends AbstractController
             return new JsonResponse($arrResponse);
         }
 
-        $arrAttribute = FormFileUpload::getAttributesFromDca([
+        $arrAttribute = FormUpload::getAttributesFromDca([
             'inputType' => 'fileTree',
             'eval' => $objField->row(),
         ], $objField->name, null, $objField->name);
 
-        $objUpload = new FormFileUpload($arrAttribute);
+        $objUpload = new FormUpload($arrAttribute);
         $objUpload->validate();
 
         if ($objUpload->hasErrors()) {

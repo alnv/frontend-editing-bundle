@@ -2,8 +2,9 @@
 
 namespace Alnv\FrontendEditingBundle\DataContainer;
 
-use Contao\DataContainer;
 use Contao\Database;
+use Contao\DataContainer;
+use Contao\FormFieldModel;
 use Contao\Input;
 use Contao\StringUtil;
 
@@ -62,8 +63,8 @@ class EntityValue
             $GLOBALS['TL_DCA']['tl_entity_value']['fields']['varValue']['eval'] = [
                 'files' => true,
                 'tl_class' => 'clr',
-                'multiple' => $objField->multiple ? true : false,
-                'mandatory' => $objField->mandatory ? true : false,
+                'multiple' => (bool)$objField->multiple,
+                'mandatory' => (bool)$objField->mandatory,
                 'fieldType' => $objField->multiple ? 'checkbox' : 'radio'
             ];
         }
