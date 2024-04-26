@@ -5,6 +5,7 @@ namespace Alnv\FrontendEditingBundle\Elements;
 use Alnv\FrontendEditingBundle\Library\DataContainer;
 use Alnv\FrontendEditingBundle\Library\FileHelper;
 use Alnv\FrontendEditingBundle\Library\Form;
+use Alnv\FrontendEditingBundle\Library\Helpers;
 use Alnv\FrontendEditingBundle\Library\States;
 use Alnv\FrontendEditingBundle\Library\Tablelist;
 use Contao\BackendTemplate;
@@ -19,7 +20,7 @@ use Contao\FrontendUser;
 use Contao\Input;
 use Contao\StringUtil;
 use Contao\System;
-use Alnv\FrontendEditingBundle\Library\Helpers;
+
 
 class FrontendEditing extends ContentElement
 {
@@ -31,6 +32,7 @@ class FrontendEditing extends ContentElement
     ];
 
     protected array $arrForms = [];
+
     protected string $strAlias = '';
     protected array $arrSubmitted = [];
     protected string $strSubmitType = '';
@@ -38,7 +40,7 @@ class FrontendEditing extends ContentElement
 
     protected $strTemplate = 'ce_frontend_editing';
 
-    public function generate()
+    public function generate(): string
     {
 
         if (Helpers::get() == 'BE') {
@@ -114,6 +116,7 @@ class FrontendEditing extends ContentElement
         }
 
         $objValues = Database::getInstance()->prepare('SELECT * FROM tl_entity_value WHERE pid=?')->execute($objEntity->id);
+
         while ($objValues->next()) {
             Database::getInstance()->prepare('DELETE FROM tl_entity_value WHERE id=?')->limit(1)->execute($objValues->id);
         }
@@ -361,8 +364,6 @@ class FrontendEditing extends ContentElement
             return 0;
         }
 
-        $objMember = FrontendUser::getInstance();
-
-        return $objMember->id;
+        return FrontendUser::getInstance()->id;
     }
 }
