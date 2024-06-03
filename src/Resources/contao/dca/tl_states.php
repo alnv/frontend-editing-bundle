@@ -1,8 +1,11 @@
 <?php
 
+use Contao\DC_Table;
+# use NotificationCenter\Model\Notification;
+
 $GLOBALS['TL_DCA']['tl_states'] = [
     'config' => [
-        'dataContainer' => 'Table',
+        'dataContainer' => DC_Table::class,
         'enableVersioning' => true,
         'sql' => [
             'keys' => [
@@ -69,12 +72,14 @@ $GLOBALS['TL_DCA']['tl_states'] = [
             ],
             'options_callback' => function () {
                 $arrReturn = [];
+                /*
                 $objNotificationCollection = \NotificationCenter\Model\Notification::findByType('feState');
                 if (null !== $objNotificationCollection) {
                     while ($objNotificationCollection->next()) {
                         $arrReturn[$objNotificationCollection->id] = $objNotificationCollection->title;
                     }
                 }
+                */
                 return $arrReturn;
             },
             'sql' => ['type' => 'integer','notnull' => false,'unsigned' => true,'default' => 0]

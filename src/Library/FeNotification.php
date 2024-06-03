@@ -10,12 +10,12 @@ use Contao\FrontendUser;
 use Contao\MemberModel;
 use Contao\StringUtil;
 use Contao\Validator;
-use NotificationCenter\Model\Notification;
+# use NotificationCenter\Model\Notification;
 
 class FeNotification
 {
 
-    public function send($strNotificationId, $strEntityId)
+    public function send($strNotificationId, $strEntityId): void
     {
 
         if (!$strNotificationId) {
@@ -28,15 +28,14 @@ class FeNotification
 
         $this->setFormTokens($strEntityId, $arrTokens);
         $this->setMemberTokens($arrTokens);
-
-        $objNotification = Notification::findByPk($strNotificationId);
-
-        if ($objNotification) {
+        /*
+        if ($objNotification = Notification::findByPk($strNotificationId)) {
             $objNotification->send($arrTokens);
         }
+        */
     }
 
-    protected function setFormTokens($strEntityId, &$arrTokens)
+    protected function setFormTokens($strEntityId, &$arrTokens): void
     {
 
         $objValues = Database::getInstance()->prepare('SELECT * FROM tl_entity_value WHERE pid=?')->execute($strEntityId);

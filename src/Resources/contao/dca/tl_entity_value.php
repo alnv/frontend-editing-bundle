@@ -1,13 +1,14 @@
 <?php
 
-use Contao\FormFieldModel;
+use Contao\DC_Table;
 use Contao\StringUtil;
+use Contao\FormFieldModel;
 use Alnv\FrontendEditingBundle\Library\Helpers;
 
 $GLOBALS['TL_DCA']['tl_entity_value'] = [
     'config' => [
         'closed' => true,
-        'dataContainer' => 'Table',
+        'dataContainer' => DC_Table::class,
         'ptable' => 'tl_entity',
         'onload_callback' => [['Alnv\FrontendEditingBundle\DataContainer\EntityValue', 'getVarValueWidget']],
         'sql' => [

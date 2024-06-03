@@ -37,6 +37,7 @@ class tl_member_fe_entities
                     <td class="tl_folder_tlist tl_right_nowrap"></td>
                 </thead>
             <tbody>';
+
         while ($objRecords->next()) {
             $arrRow = $objRecords->row();
             $strReturn .= '
@@ -47,6 +48,7 @@ class tl_member_fe_entities
                     <td class="tl_file_list tl_right_nowrap">' . $widget->generateRowOperation('edit', $arrRow) . $widget->generateRowOperation('show', $arrRow) . '</td>
                 </tr>';
         }
+
         $strReturn .= '</tbody></table>';
         return $strReturn;
     }

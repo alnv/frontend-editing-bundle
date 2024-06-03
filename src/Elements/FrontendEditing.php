@@ -34,8 +34,11 @@ class FrontendEditing extends ContentElement
     protected array $arrForms = [];
 
     protected string $strAlias = '';
+
     protected array $arrSubmitted = [];
-    protected string $strSubmitType = '';
+
+    protected null|string $strSubmitType = '';
+
     protected string $strActiveForm = '';
 
     protected $strTemplate = 'ce_frontend_editing';
@@ -45,7 +48,7 @@ class FrontendEditing extends ContentElement
 
         if (Helpers::get() == 'BE') {
             $objTemplate = new BackendTemplate('be_wildcard');
-            $objTemplate->wildcard = '### FRONTEND EDITING ###';
+            $objTemplate->wildcard = '### FormListEditor ###';
             $objTemplate->id = $this->id;
             return $objTemplate->parse();
         }
@@ -61,7 +64,7 @@ class FrontendEditing extends ContentElement
         $this->deleteAndReload();
         $this->strActiveForm = $this->getFormId();
 
-        if ($_GET['auto_item']) {
+        if (($_GET['auto_item'] ?? '')) {
             if (!in_array($this->strActiveForm, array_keys($this->arrForms))) {
                 return '';
             }
@@ -73,7 +76,7 @@ class FrontendEditing extends ContentElement
     protected function setAlias(): void
     {
 
-        if ($_GET['auto_item']) {
+        if (($_GET['auto_item'] ?? '')) {
             $this->strAlias = Input::get('auto_item');
         } else {
             $this->strAlias = md5(time() . uniqid());
@@ -83,7 +86,7 @@ class FrontendEditing extends ContentElement
     protected function deleteAndReload()
     {
 
-        if ($_GET['auto_item'] !== 'delete') {
+        if (($_GET['auto_item'] ?? '') !== 'delete') {
             return null;
         }
 
@@ -95,7 +98,7 @@ class FrontendEditing extends ContentElement
             $arrValues[] = $this->getMemberId();
         }
 
-        $objEntity = Database::getInstance()->prepare('SELECT * FROM tl_entity WHERE id=?' . ($this->arrSettings['saveMemberId'] ? ' AND member=?' : ''))->limit(1)->execute($arrValues);
+        $objEntity = Database::getInstance()->prepare('SELECT * FROM tl_entity WHERE id=?' . ($this->arrSettings['saveMemberId'] ? ' AND member=?' : ''))->limit(1)->execute(...$arrValues);
         if (!$objEntity->numRows) {
             return null;
         }
@@ -106,12 +109,7 @@ class FrontendEditing extends ContentElement
 
         if (isset($GLOBALS['TL_HOOKS']['onDeleteEntity']) && is_array($GLOBALS['TL_HOOKS']['onDeleteEntity'])) {
             foreach ($GLOBALS['TL_HOOKS']['onDeleteEntity'] as $arrCallback) {
-                if (is_array($arrCallback)) {
-                    $this->import($arrCallback[0]);
-                    $this->{$arrCallback[0]}->{$arrCallback[1]}($objEntity->row(), $this);
-                } elseif (\is_callable($arrCallback)) {
-                    $arrCallback($objEntity->row(), $this);
-                }
+                System::importStatic($arrCallback[0])->{$arrCallback[1]}($objEntity->row(), $this);
             }
         }
 
@@ -127,7 +125,6 @@ class FrontendEditing extends ContentElement
 
     protected function compile(): void
     {
-
         if ($this->arrSettings['showForm']) {
             $this->generateForm();
         } else {
@@ -154,7 +151,7 @@ class FrontendEditing extends ContentElement
     protected function getFormId(): string
     {
 
-        if ($_GET['auto_item']) {
+        if (($_GET['auto_item'] ?? '')) {
             $arrEntity = (new Form())->getEntityByAlias($this->strAlias);
             if (!empty($arrEntity)) {
                 $objGroup = Database::getInstance()->prepare('SELECT * FROM tl_entity_group WHERE id=?')->limit(1)->execute($arrEntity['pid']);
@@ -167,7 +164,7 @@ class FrontendEditing extends ContentElement
             return $strFormId;
         }
 
-        if (!empty($this->arrForms) && count($this->arrForms) < 2) {
+        if (!empty($this->arrForms) && count($this->arrForms) > 0) {
             $arrForms = array_keys($this->arrForms);
             return $arrForms[0] ?: '';
         }
@@ -208,6 +205,7 @@ class FrontendEditing extends ContentElement
         }
 
         $arrTemplateData = [
+            'requestToken' => System::getContainer()->get('contao.csrf.token_manager')->getDefaultTokenValue(),
             'formId' => $this->strActiveForm,
             'submitId' => $this->getSubmitId(),
             'buttons' => $this->arrSettings['submitButtons'],
@@ -268,22 +266,17 @@ class FrontendEditing extends ContentElement
             (new Form())->setValue($varValue, $objField, $arrEntity['id']);
         }
 
-        if (!$arrEntity['status']) {
+        if (!($arrEntity['status'] ?? '')) {
             (new Form())->setStatus($this->arrSettings['status'], $arrEntity['id']);
         }
 
-        if ($arrEntity['status'] && $this->arrSettings['status'] != $this->startStatus) {
+        if (($arrEntity['status'] ?? '') && $this->arrSettings['status'] != $this->startStatus) {
             (new Form())->setStatus($this->arrSettings['status'], $arrEntity['id']);
         }
 
         if (isset($GLOBALS['TL_HOOKS']['onSaveEntity']) && is_array($GLOBALS['TL_HOOKS']['onSaveEntity'])) {
             foreach ($GLOBALS['TL_HOOKS']['onSaveEntity'] as $arrCallback) {
-                if (is_array($arrCallback)) {
-                    $this->import($arrCallback[0]);
-                    $this->{$arrCallback[0]}->{$arrCallback[1]}($this->arrSubmitted, $arrEntity['id'], $this);
-                } elseif (\is_callable($arrCallback)) {
-                    $arrCallback($this->arrSubmitted, $arrEntity['id'], $this);
-                }
+                System::importStatic($arrCallback[0])->{$arrCallback[1]}($this->arrSubmitted, $arrEntity['id'], $this);
             }
         }
 
@@ -343,7 +336,7 @@ class FrontendEditing extends ContentElement
     {
 
         $this->arrSettings['saveMemberId'] = $this->addMemberPermissions && $this->addMemberId;
-        $this->arrSettings['showForm'] = $_GET['auto_item'] || $this->disableList;
+        $this->arrSettings['showForm'] = ($_GET['auto_item'] ?? '') || $this->disableList;
         $this->arrSettings['submitButtons'] = (new DataContainer())->getSubmitByChoice($this->submitButtons);
         $this->arrSettings['status'] = $this->startStatus ?: 0;
         $this->arrSettings['titleColumn'] = $this->titleColumn ?: '';

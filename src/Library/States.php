@@ -2,9 +2,10 @@
 
 namespace Alnv\FrontendEditingBundle\Library;
 
-use Contao\Database;
 use Contao\Controller;
+use Contao\Database;
 use Contao\StringUtil;
+use Contao\System;
 
 class States extends Controller
 {
@@ -31,12 +32,7 @@ class States extends Controller
 
         if (isset($GLOBALS['TL_HOOKS']['changeState']) && is_array($GLOBALS['TL_HOOKS']['changeState'])) {
             foreach ($GLOBALS['TL_HOOKS']['changeState'] as $arrCallback) {
-                if (is_array($arrCallback)) {
-                    $this->import($arrCallback[0]);
-                    $this->{$arrCallback[0]}->{$arrCallback[1]}($strEntityId, $strStateId, $this);
-                } elseif (\is_callable($arrCallback)) {
-                    $arrCallback($strEntityId, $strStateId, $this);
-                }
+                System::importStatic($arrCallback[0])->{$arrCallback[1]}($strEntityId, $strStateId, $this);
             }
         }
 

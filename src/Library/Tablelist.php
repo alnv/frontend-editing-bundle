@@ -27,7 +27,7 @@ class Tablelist
             $arrQueryValues[] = FrontendUser::getInstance()->id;
         }
 
-        $objEntities = Database::getInstance()->prepare('SELECT * FROM tl_entity' . (empty($arrQueryColumns) ? '' : ' WHERE ' . implode(' AND ', $arrQueryColumns)))->execute($arrQueryValues);
+        $objEntities = Database::getInstance()->prepare('SELECT * FROM tl_entity' . (empty($arrQueryColumns) ? '' : ' WHERE ' . implode(' AND ', $arrQueryColumns)))->execute(...$arrQueryValues);
 
         if (!$objEntities->numRows) {
             return $arrReturn;
@@ -46,7 +46,7 @@ class Tablelist
             $arrSet['title'] = $arrSettings['titleColumn'] ? Helpers::parseSimpleTokens($arrSettings['titleColumn'], $this->getFormTokens($arrValues)) : '';
             $arrSet['values'] = $arrValues;
             $arrSet['buttons'] = $this->getButtons($arrSet);
-            $arrSet['updated_at'] = (new Date($arrSet['stamp']))->datim;
+            $arrSet['updated_at'] = (new Date($arrSet['tstamp']))->datim;
             $arrSet['created_at'] = (new Date($arrSet['created_at']))->datim;
             $arrSet['group'] = Database::getInstance()->prepare('SELECT * FROM tl_entity_group WHERE id=?')->limit(1)->execute($objEntities->pid)->row();
 
@@ -125,10 +125,10 @@ class Tablelist
             'href' => $objPage->getFrontendUrl('/delete') . '?id=' . $arrEntity['id'],
             'icon' => 'system/themes/flexible/icons/delete.svg',
             'label' => $GLOBALS['TL_LANG']['MSC']['deleteButton'],
-            'attributes' => ' onclick="return confirm(\'Sind Sie sicher, dass Sie den Beitrag löschen wollen?\')"'
+            'attributes' => ' onclick="return confirm(\''. $GLOBALS['TL_LANG']['MSC']['fre_table_delete_confirm'] .'\')"'
         ];
 
-        $arrExcludes = (new States())->getStateExcludes($arrEntity['status']['id']);
+        $arrExcludes = (new States())->getStateExcludes(($arrEntity['status']['id'] ?? ''));
         if (!empty($arrExcludes)) {
             foreach ($arrExcludes as $strExclude) {
                 unset($arrReturn[$strExclude]);

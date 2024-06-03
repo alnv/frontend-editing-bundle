@@ -107,8 +107,7 @@ class Export extends System
 
         if (isset($GLOBALS['TL_HOOKS']['feEditingParseExport']) && is_array($GLOBALS['TL_HOOKS']['feEditingParseExport'])) {
             foreach ($GLOBALS['TL_HOOKS']['feEditingParseExport'] as $arrCallback) {
-                $this->import($arrCallback[0]);
-                $arrRows = $this->{$arrCallback[0]}->{$arrCallback[1]}($arrRows, $objEntities->reset(), $objEntityGroup, $objForm, $this);
+                System::importStatic($arrCallback[0])->{$arrCallback[1]}($arrRows, $objEntities->reset(), $objEntityGroup, $objForm, $this);
             }
         }
 

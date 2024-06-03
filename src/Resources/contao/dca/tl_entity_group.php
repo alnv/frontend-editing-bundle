@@ -1,10 +1,11 @@
 <?php
 
+use Contao\DC_Table;
 use Contao\FormModel;
 
 $GLOBALS['TL_DCA']['tl_entity_group'] = [
     'config' => [
-        'dataContainer' => 'Table',
+        'dataContainer' => DC_Table::class,
         'closed' => true,
         'notEditable' => true,
         'notCopyable' => true,

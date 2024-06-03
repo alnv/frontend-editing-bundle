@@ -43,8 +43,8 @@ class DataContainer
         $objStatus = Database::getInstance()->prepare('SELECT * FROM tl_states WHERE id=?')->limit(1)->execute($strStatusId);
         $arrReturn = $objStatus->row();
 
-        $arrReturn['note'] = Helpers::replaceInsertTags(StringUtil::decodeEntities($arrReturn['note']));
-        $arrReturn['uploads'] = FileHelper::getFiles($arrReturn['uploads'], StringUtil::deserialize($arrReturn['uploadsOrderSRC'], true));
+        $arrReturn['note'] = Helpers::replaceInsertTags(StringUtil::decodeEntities(($arrReturn['note']??'')));
+        $arrReturn['uploads'] = FileHelper::getFiles(($arrReturn['uploads']??''), StringUtil::deserialize(($arrReturn['uploadsOrderSRC']??''), true));
 
         return $arrReturn;
     }

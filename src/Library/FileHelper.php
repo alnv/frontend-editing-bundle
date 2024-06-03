@@ -15,26 +15,28 @@ use Contao\System;
 
 class FileHelper
 {
-    public static function sendFileToBrowser()
+    public static function sendFileToBrowser(): void
     {
 
         $strFile = Input::get('file');
 
         if (!$strFile) {
-            return null;
+            return;
         }
 
         if (!is_array($GLOBALS['DOWNLOADABLE-FILES']) || empty($GLOBALS['DOWNLOADABLE-FILES'])) {
-            return null;
+            return;
         }
 
         foreach ($GLOBALS['DOWNLOADABLE-FILES'] as $strPath) {
             if ($strFile == $strPath || \dirname($strFile) == $strPath) {
+
                 if (isset($GLOBALS['TL_HOOKS']['beforeDownload']) && is_array($GLOBALS['TL_HOOKS']['beforeDownload'])) {
                     foreach ($GLOBALS['TL_HOOKS']['beforeDownload'] as $arrCallback) {
-                        (new $arrCallback[0])->{$arrCallback[1]}($strFile);
+                        System::importStatic($arrCallback[0])->{$arrCallback[1]}($strFile);
                     }
                 }
+
                 Controller::sendFileToBrowser($strFile);
             }
         }
@@ -91,10 +93,10 @@ class FileHelper
                 $GLOBALS['DOWNLOADABLE-FILES'][] = $objFiles->path;
                 $arrMeta = static::getMeta($objFiles->meta, $objFiles);
 
-                if (isset($_GET['file'])) {
+                if (($_GET['file']??'')) {
                     $strHref = preg_replace('/(&(amp;)?|\?)file=[^&]+/', '', $strHref);
                 }
-                if (isset($_GET['cid'])) {
+                if (($_GET['cid']??'')) {
                     $strHref = preg_replace('/(&(amp;)?|\?)cid=\d+/', '', $strHref);
                 }
 

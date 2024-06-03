@@ -17,12 +17,17 @@ $GLOBALS['TL_LANG']['MSC']['uploadNameColumn'] = 'Name';
 $GLOBALS['TL_LANG']['MSC']['uploadTitleColumn'] = 'Meta-Titel';
 $GLOBALS["TL_LANG"]["MSC"]["dropzoneDzMessage"] = 'Datei hier zum Hochladen ablegen.';
 
+$GLOBALS["TL_LANG"]["MSC"]["fre_table_title_label"] = 'Erstellt am';
+$GLOBALS["TL_LANG"]["MSC"]["fre_table_updated_at_label"] = 'Aktualisiert am';
+$GLOBALS["TL_LANG"]["MSC"]["fre_table_state_label"] = 'Status';
+$GLOBALS['TL_LANG']['MSC']['fre_table_delete_confirm'] = 'Sind Sie sicher, dass Sie den Beitrag löschen wollen?';
+
 $GLOBALS["TL_LANG"]["MSC"]["dictDefaultMessage"] = "Dateien zum Hochladen hier ablegen";
 $GLOBALS["TL_LANG"]["MSC"]["dictFallbackMessage"] = "Ihr Browser unterstützt keine Drag\'n\'Drop-Datei-Uploads.";
 $GLOBALS["TL_LANG"]["MSC"]["dictFallbackText"] = "Bitte verwenden Sie das untenstehende Fallback-Formular, um Ihre Dateien wie in alten Zeiten hochzuladen.";
-$GLOBALS["TL_LANG"]["MSC"]["dictFileTooBig"] = "Datei ist zu groß ({{filesize}}MiB). Maximale Dateigröße: {{maxFilesize}}MiB.";
+$GLOBALS["TL_LANG"]["MSC"]["dictFileTooBig"] = "Datei ist zu groß ({{ filesize }}MiB). Maximale Dateigröße: {{ maxFilesize }}MiB.";
 $GLOBALS["TL_LANG"]["MSC"]["dictInvalidFileType"] = "Sie können keine Dateien dieses Typs hochladen.Datei entfernen";
-$GLOBALS["TL_LANG"]["MSC"]["dictResponseError"] = "Der Server hat mit dem Code {{statusCode}} geantwortet.";
+$GLOBALS["TL_LANG"]["MSC"]["dictResponseError"] = "Der Server hat mit dem Code {{ statusCode }} geantwortet.";
 $GLOBALS["TL_LANG"]["MSC"]["dictCancelUpload"] = "Upload abbrechen";
 $GLOBALS["TL_LANG"]["MSC"]["dictCancelUploadConfirmation"] = "Sind Sie sicher, dass Sie diesen Upload abbrechen möchten?";
 $GLOBALS["TL_LANG"]["MSC"]["dictRemoveFile"] = "Datei entfernen";

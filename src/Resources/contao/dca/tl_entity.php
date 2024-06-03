@@ -1,6 +1,7 @@
 <?php
 
 use Contao\Input;
+use Contao\DC_Table;
 use Contao\StringUtil;
 use Contao\Controller;
 use Contao\DataContainer;
@@ -12,7 +13,7 @@ use Alnv\FrontendEditingBundle\Library\States;
 $GLOBALS['TL_DCA']['tl_entity'] = [
     'config' => [
         'closed' => true,
-        'dataContainer' => 'Table',
+        'dataContainer' => DC_Table::class,
         'ptable' => 'tl_entity_group',
         'ctable' => ['tl_entity_value'],
         'onload_callback' => [function() {
