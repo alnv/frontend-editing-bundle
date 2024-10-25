@@ -25,9 +25,9 @@
     <table>
         <tr>
             <th><?= $this->titleHeadline ?></th>
-            <th>Erstellt am</th>
-            <th>Aktualisiert am</th>
-            <th>Status</th>
+            <th><?= $GLOBALS["TL_LANG"]["MSC"]["fre_table_title_label"] ?></th>
+            <th><?= $GLOBALS["TL_LANG"]["MSC"]["fre_table_updated_at_label"] ?></th>
+            <th><?= $GLOBALS["TL_LANG"]["MSC"]["fre_table_state_label"] ?></th>
             <th></th>
         </tr>
         <?php foreach ($this->entities as $arrEntity): ?>
@@ -36,7 +36,7 @@
                 <td><?= $arrEntity['created_at'] ?></td>
                 <td><?= $arrEntity['updated_at'] ?></td>
                 <td>
-                    <span <?php if ($arrEntity['status']['color']): ?>style="border-radius:5px;padding:4px 4px 5px 4px;color:#fff;background-color:#<?= $arrEntity['status']['color'] ?>"<?php endif; ?>><?= $arrEntity['status']['name'] ?></span>
+                    <span <?php if (($arrEntity['status']['color']??'')): ?>style="border-radius:5px;padding:4px 4px 5px 4px;color:#fff;background-color:#<?= $arrEntity['status']['color'] ?>"<?php endif; ?>><?= ($arrEntity['status']['name']??'') ?></span>
                     <?php if ($arrEntity['status']['note']): ?>
                         <?= $arrEntity['status']['note'] ?>
                     <?php endif; ?>
@@ -54,7 +54,7 @@
                 </td>
                 <td>
                     <?php foreach ($arrEntity['buttons'] as $arrButton): ?>
-                        <a href="<?= $arrButton['href'] ?>"<?= $arrButton['attributes'] ?>><img src="<?= $arrButton['icon'] ?>" alt="<?= $arrButton['label'] ?>"></a>
+                        <a href="<?= $arrButton['href'] ?>"<?= ($arrButton['attributes']??'') ?>><img src="<?= $arrButton['icon'] ?>" alt="<?= $arrButton['label'] ?>"></a>
                     <?php endforeach; ?>
                 </td>
             </tr>

@@ -2,11 +2,19 @@
 
 namespace Alnv\FrontendEditingBundle\Library;
 
-class DataContainer {
+use Alnv\FrontendEditingBundle\Library\Helpers;
+use Contao\Controller;
+use Contao\Database;
+use Contao\StringUtil;
+use Contao\System;
 
-    public function getSubmits() {
+class DataContainer
+{
 
-        \System::loadLanguageFile('default');
+    public function getSubmits(): array
+    {
+
+        System::loadLanguageFile('default');
 
         return [
             'save' => $GLOBALS['TL_LANG']['MSC']['submitSave'],
@@ -16,22 +24,27 @@ class DataContainer {
         ];
     }
 
-    public function getSubmitByChoice($varChoice) {
+    public function getSubmitByChoice($varChoice): array
+    {
 
         $arrReturn = [];
         $arrSubmits = $this->getSubmits();
-        foreach (\StringUtil::deserialize($varChoice) as $strButtonName) {
+
+        foreach (StringUtil::deserialize($varChoice, true) as $strButtonName) {
             $arrReturn[$strButtonName] = $arrSubmits[$strButtonName] ?: '';
         }
+
         return $arrReturn;
     }
 
-    public function getStatus($strStatusId) {
+    public function getStatus($strStatusId): array
+    {
 
-        $objStatus = \Database::getInstance()->prepare('SELECT * FROM tl_states WHERE id=?')->limit(1)->execute($strStatusId);
+        $objStatus = Database::getInstance()->prepare('SELECT * FROM tl_states WHERE id=?')->limit(1)->execute($strStatusId);
         $arrReturn = $objStatus->row();
-        $arrReturn['note'] = \Controller::replaceInsertTags(\StringUtil::decodeEntities($arrReturn['note']));
-        $arrReturn['uploads'] = \Alnv\FrontendEditingBundle\Library\FileHelper::getFiles($arrReturn['uploads'], \StringUtil::deserialize($arrReturn['uploadsOrderSRC'], true));
+
+        $arrReturn['note'] = Helpers::replaceInsertTags(StringUtil::decodeEntities(($arrReturn['note']??'')));
+        $arrReturn['uploads'] = FileHelper::getFiles(($arrReturn['uploads']??''), StringUtil::deserialize(($arrReturn['uploadsOrderSRC']??''), true));
 
         return $arrReturn;
     }

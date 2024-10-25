@@ -1,9 +1,14 @@
 <?php
 
+use Contao\DC_Table;
+use Contao\StringUtil;
+use Contao\FormFieldModel;
+use Alnv\FrontendEditingBundle\Library\Helpers;
+
 $GLOBALS['TL_DCA']['tl_entity_value'] = [
     'config' => [
         'closed' => true,
-        'dataContainer' => 'Table',
+        'dataContainer' => DC_Table::class,
         'ptable' => 'tl_entity',
         'onload_callback' => [['Alnv\FrontendEditingBundle\DataContainer\EntityValue', 'getVarValueWidget']],
         'sql' => [
@@ -28,15 +33,15 @@ $GLOBALS['TL_DCA']['tl_entity_value'] = [
                     $strValue = $arrRow[$strField];
                     switch ($strField) {
                         case 'field':
-                            $objField = \FormFieldModel::findByPk($strValue);
+                            $objField = FormFieldModel::findByPk($strValue);
                             if ($objField) {
                                 $strValue = $objField->label ?: $objField->name;
                             }
                             break;
                         case 'varValue':
-                            $strValue = \StringUtil::deserialize($strValue);
+                            $strValue = StringUtil::deserialize($strValue);
                             if (is_array($strValue)) {
-                                $strValue = \Alnv\FrontendEditingBundle\Library\Helpers::makeArrayReadable($strValue);
+                                $strValue = Helpers::makeArrayReadable($strValue);
                             }
                             break;
                     }
@@ -54,7 +59,7 @@ $GLOBALS['TL_DCA']['tl_entity_value'] = [
             'delete' => [
                 'href' => 'act=delete',
                 'icon' => 'delete.svg',
-                'attributes' => 'onclick="if(!confirm(\'' . $GLOBALS['TL_LANG']['MSC']['deleteConfirm'] . '\'))return false;Backend.getScrollOffset()"'
+                'attributes' => 'onclick="if(!confirm(\'' . ($GLOBALS['TL_LANG']['MSC']['deleteConfirm']??'') . '\'))return false;Backend.getScrollOffset()"'
             ],
             'show' => [
                 'href' => 'act=show',

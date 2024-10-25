@@ -1,17 +1,27 @@
 <?php
 
+use Contao\Input;
+use Contao\DC_Table;
+use Contao\StringUtil;
+use Contao\Controller;
+use Contao\DataContainer;
+use Alnv\FrontendEditingBundle\Library\Helpers;
+use Alnv\FrontendEditingBundle\Library\Export;
+use Alnv\FrontendEditingBundle\Library\Tablelist;
+use Alnv\FrontendEditingBundle\Library\States;
+
 $GLOBALS['TL_DCA']['tl_entity'] = [
     'config' => [
         'closed' => true,
-        'dataContainer' => 'Table',
+        'dataContainer' => DC_Table::class,
         'ptable' => 'tl_entity_group',
         'ctable' => ['tl_entity_value'],
         'onload_callback' => [function() {
-            if (!\Input::get('export')) {
+            if (!Input::get('export')) {
                 return null;
             }
-            (new \Alnv\FrontendEditingBundle\Library\Export())->download(\Input::get('id'));
-            \Controller::redirect(preg_replace('/&(amp;)?export=[^&]*/i', '', preg_replace( '/&(amp;)?' . preg_quote(\Input::get('export'), '/') . '=[^&]*/i', '', \Environment::get('request'))));
+            (new Export())->download(Input::get('id'));
+            Controller::redirect(preg_replace('/&(amp;)?export=[^&]*/i', '', preg_replace( '/&(amp;)?' . preg_quote(\Input::get('export'), '/') . '=[^&]*/i', '', \Environment::get('request'))));
         }],
         'sql' => [
             'keys' => [
@@ -27,12 +37,12 @@ $GLOBALS['TL_DCA']['tl_entity'] = [
             'panelLayout' => 'filter;search,limit',
             'child_record_callback'  => function ($arrRow) {
                 $strTemplate = '';
-                foreach ((new \Alnv\FrontendEditingBundle\Library\Tablelist())->getValues($arrRow['id']) as $arrField) {
-                    $strValue = \StringUtil::deserialize($arrField['value']);
+                foreach ((new Tablelist())->getValues($arrRow['id']) as $arrField) {
+                    $strValue = StringUtil::deserialize($arrField['value']);
                     if (is_array($strValue)) {
-                        $strValue = \Alnv\FrontendEditingBundle\Library\Helpers::makeArrayReadable($strValue);
+                        $strValue = Helpers::makeArrayReadable($strValue);
                     }
-                    $strTemplate .= ($arrField['label']?$arrField['label']:$arrField['name']) .': ' . $strValue . '</br>';
+                    $strTemplate .= ($arrField['label']?:$arrField['name']) .': ' . $strValue . '</br>';
                 }
                 return $strTemplate;
             }
@@ -49,7 +59,7 @@ $GLOBALS['TL_DCA']['tl_entity'] = [
             'delete' => [
                 'href' => 'act=delete',
                 'icon' => 'delete.svg',
-                'attributes' => 'onclick="if(!confirm(\'' . $GLOBALS['TL_LANG']['MSC']['deleteConfirm'] . '\'))return false;Backend.getScrollOffset()"'
+                'attributes' => 'onclick="if(!confirm(\'' . ($GLOBALS['TL_LANG']['MSC']['deleteConfirm']??'') . '\'))return false;Backend.getScrollOffset()"'
             ],
             'show' => [
                 'href' => 'act=show',
@@ -119,9 +129,9 @@ $GLOBALS['TL_DCA']['tl_entity'] = [
                 'load' => 'lazy'
             ],
             'save_callback' => [
-                function ($strStatusId, \DataContainer $dataContainer) {
+                function ($strStatusId, DataContainer $dataContainer) {
                     if ($strStatusId && $dataContainer->activeRecord->status !== $strStatusId) {
-                        (new \Alnv\FrontendEditingBundle\Library\States())->changeState($dataContainer->activeRecord->id, $strStatusId);
+                        (new States())->changeState($dataContainer->activeRecord->id, $strStatusId);
                     }
                     return $strStatusId;
                 }

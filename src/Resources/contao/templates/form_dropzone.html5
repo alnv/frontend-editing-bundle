@@ -3,7 +3,8 @@
 <?php if ($this->label): ?>
     <label for="ctrl_<?= $this->id ?>"<?php if ($this->class): ?> class="<?= $this->class ?>"<?php endif; ?>>
         <?php if ($this->mandatory): ?>
-            <span class="invisible"><?= $this->mandatoryField ?> </span><?= $this->label ?><span class="mandatory">*</span>
+            <span class="invisible"><?= $this->mandatoryField ?> </span><?= $this->label ?><span
+                    class="mandatory">*</span>
         <?php else: ?>
             <?= $this->label ?>
         <?php endif; ?>
@@ -12,12 +13,21 @@
 <?php $this->endblock(); ?>
 <?php $this->block('field'); ?>
 <?php
-    $arrFiles = \Alnv\FrontendEditingBundle\Library\Helpers::getDropzoneValue($this->value);
-    $objCombiner = new \Combiner();
-    $objCombiner->add('bundles/alnvfrontendediting/dropzone/basic.min.css');
-    $objCombiner->add('bundles/alnvfrontendediting/dropzone/dropzone.min.css');
-    $GLOBALS['TL_CSS']['cssDropzone'] = $objCombiner->getCombinedFile();
-    $GLOBALS['TL_HEAD']['jDropzone'] = '<script src="/bundles/alnvfrontendediting/dropzone/dropzone.min.js"></script>';
+
+use Contao\Combiner;
+use Contao\FilesModel;
+use Contao\File;
+use Contao\Controller;
+use Contao\StringUtil;
+use Alnv\FrontendEditingBundle\Library\FileHelper;
+use Alnv\FrontendEditingBundle\Library\Helpers;
+
+$arrFiles = Helpers::getDropzoneValue($this->value);
+$objCombiner = new Combiner();
+$objCombiner->add('bundles/alnvfrontendediting/dropzone/basic.min.css');
+$objCombiner->add('bundles/alnvfrontendediting/dropzone/dropzone.min.css');
+$GLOBALS['TL_CSS']['cssDropzone'] = $objCombiner->getCombinedFile();
+$GLOBALS['TL_HEAD']['jDropzone'] = '<script src="/bundles/alnvfrontendediting/dropzone/dropzone.min.js"></script>';
 ?>
 <div class="dropzone-files">
     <?php if (!empty($arrFiles)): ?>
@@ -29,33 +39,39 @@
             </tr>
             <?php foreach ($arrFiles as $strUud): ?>
                 <?php
-                $objFileModel = \FilesModel::findByUuid($strUud);
+                $objFileModel = FilesModel::findByUuid($strUud);
                 if (!$objFileModel) {
                     continue;
                 }
                 ?>
-                <?php if ($objFile = new \File($objFileModel->path)): ?>
-                    <tr data-uuid="<?= \StringUtil::binToUuid($objFileModel->uuid) ?>">
-                        <?php $arrMeta = \Alnv\FrontendEditingBundle\Library\FileHelper::getMeta($objFileModel->meta, $objFile); ?>
+                <?php if ($objFile = new File($objFileModel->path)): ?>
+                    <tr data-uuid="<?= StringUtil::binToUuid($objFileModel->uuid) ?>">
+                        <?php $arrMeta = FileHelper::getMeta($objFileModel->meta, $objFile); ?>
                         <td>
                             <div class="ce_download block">
-                                <?php if (in_array($objFileModel->extension, ['png','jpeg','jpg'])): ?>
+                                <?php if (in_array($objFileModel->extension, ['png', 'jpeg', 'jpg'])): ?>
                                     <figure>
                                         <img src="<?= $objFileModel->path ?>" alt="" style="max-height:75px">
                                     </figure>
-                                    <p class="download-element ext-<?= $objFileModel->extension ?>"><?= $arrMeta['title'] ?> <span class="size">(<?= \Controller::getReadableSize($objFile->filesize) ?>)</span></p>
+                                    <p class="download-element ext-<?= $objFileModel->extension ?>"><?= $arrMeta['title'] ?>
+                                        <span class="size">(<?= Controller::getReadableSize($objFile->filesize) ?>)</span>
+                                    </p>
                                 <?php else: ?>
-                                    <p class="download-element ext-<?= $objFileModel->extension ?>"><?= $arrMeta['title'] ?> <span class="size">(<?= \Controller::getReadableSize($objFile->filesize) ?>)</span></p>
+                                    <p class="download-element ext-<?= $objFileModel->extension ?>"><?= $arrMeta['title'] ?>
+                                        <span class="size">(<?= Controller::getReadableSize($objFile->filesize) ?>)</span>
+                                    </p>
                                 <?php endif; ?>
                             </div>
                         </td>
                         <td>
                             <div class="widget widget-text">
-                                <input type="text" id="id_<?= \StringUtil::binToUuid($objFileModel->uuid) ?>" value="<?= $arrMeta['title'] ?>">
+                                <input type="text" id="id_<?= StringUtil::binToUuid($objFileModel->uuid) ?>" value="<?= $arrMeta['title'] ?>">
                                 <button type="button" class="button meta"><?= $GLOBALS['TL_LANG']['MSC']['submitMeta'] ?></button>
                             </div>
                         </td>
-                        <td><button type="button" class="button delete"><img src="/system/themes/flexible/icons/delete.svg" alt=""></button></td>
+                        <td>
+                            <button type="button" class="button delete"><img src="/system/themes/flexible/icons/delete.svg" alt=""></button>
+                        </td>
                     </tr>
                 <?php endif; ?>
             <?php endforeach; ?>
@@ -67,15 +83,16 @@
     <div id="id_dropzone_<?= $this->id ?>" class="dropzone">
         <div class="dz-message"><?= $GLOBALS["TL_LANG"]["MSC"]["dropzoneDzMessage"] ?></div>
     </div>
-    <p id="id_error_<?= $this->id ?>" class="<?= ($this->hasErrors()?'error':'') ?>"><?= ($this->hasErrors()?$this->getErrorAsString():'') ?></p>
+    <p id="id_error_<?= $this->id ?>"
+       class="<?= ($this->hasErrors() ? 'error' : '') ?>"><?= ($this->hasErrors() ? $this->getErrorAsString() : '') ?></p>
 </div>
 <script async defer>
-    (function (){
+    (function () {
 
         Dropzone.autoDiscover = false;
         Dropzone.prototype.defaultOptions.dictDefaultMessage = '<?= $GLOBALS["TL_LANG"]["MSC"]["dictDefaultMessage"] ?>';
         Dropzone.prototype.defaultOptions.dictFallbackMessage = '<?= $GLOBALS["TL_LANG"]["MSC"]["dictFallbackMessage"] ?>';
-        Dropzone.prototype.defaultOptions.dictFallbackText ='<?= $GLOBALS["TL_LANG"]["MSC"]["dictFallbackText"] ?>';
+        Dropzone.prototype.defaultOptions.dictFallbackText = '<?= $GLOBALS["TL_LANG"]["MSC"]["dictFallbackText"] ?>';
         Dropzone.prototype.defaultOptions.dictFileTooBig = '<?= $GLOBALS["TL_LANG"]["MSC"]["dictFileTooBig"] ?>';
         Dropzone.prototype.defaultOptions.dictInvalidFileType = '<?= $GLOBALS["TL_LANG"]["MSC"]["dictInvalidFileType"] ?>';
         Dropzone.prototype.defaultOptions.dictResponseError = '<?= $GLOBALS["TL_LANG"]["MSC"]["dictResponseError"] ?>';
@@ -94,12 +111,12 @@
                 url: '/dropzone/upload/<?= $this->id ?>',
                 paramName: '<?= $this->name ?>',
                 parallelUploads: 1,
-                maxFilesize: <?= ($this->maxlength?$this->maxlength:256) ?>,
-                maxFiles: <?= !$this->multiple?1:$this->mSize ?>,
+                maxFilesize: <?= ($this->maxlength ?: 256) ?>,
+                maxFiles: <?= !$this->multiple ? 1 : $this->mSize ?>,
                 timeout: 0,
                 addRemoveLinks: true,
                 params: {
-                    uploads: <?= (empty($arrFiles)?'[]':json_encode($arrFiles, 512)) ?>
+                    uploads: <?= (empty($arrFiles) ? '[]' : json_encode($arrFiles, 512)) ?>
                 }
             };
 
@@ -111,7 +128,7 @@
                 }
                 let objResponse = JSON.parse(file.xhr.response);
                 if (!objResponse.success) {
-                    setError((objResponse.error?objResponse.error:objResponse.message))
+                    setError((objResponse.error ? objResponse.error : objResponse.message))
                 } else {
                     if (objResponse.file.uuid) {
                         try {
@@ -128,13 +145,13 @@
             objDropzone.on('removedfile', function (file) {
                 let objResponse = JSON.parse(file.xhr.response);
                 let objXHttp = new XMLHttpRequest();
-                objXHttp.open('POST', '/dropzone/remove/'+objResponse.file.uuid, true);
+                objXHttp.open('POST', '/dropzone/remove/' + objResponse.file.uuid, true);
                 objXHttp.send();
                 removeUpload(objResponse.file.uuid)
             });
 
             let arrDeleteFiles = document.querySelectorAll("#id_list_<?= $this->id ?> button.delete");
-            for (let i=0;i<arrDeleteFiles.length;i++) {
+            for (let i = 0; i < arrDeleteFiles.length; i++) {
                 let objButton = arrDeleteFiles[i];
                 if (!objButton) {
                     continue;
@@ -150,7 +167,7 @@
             }
 
             let arrMetaButtons = document.querySelectorAll("#id_list_<?= $this->id ?> button.meta");
-            for (let i=0;i<arrMetaButtons.length;i++) {
+            for (let i = 0; i < arrMetaButtons.length; i++) {
                 let objButton = arrMetaButtons[i];
                 if (!objButton) {
                     continue;
@@ -159,14 +176,14 @@
                     e.preventDefault();
                     let node = getUuidNodeFromButton(this)
                     if (node.dataset.uuid && typeof node.dataset.uuid !== 'undefined') {
-                        let strTitle = document.querySelector('#id_'+node.dataset.uuid).value;
+                        let strTitle = document.querySelector('#id_' + node.dataset.uuid).value;
                         let objXmlHttp = new XMLHttpRequest();
-                        objXmlHttp.onreadystatechange = function() {
+                        objXmlHttp.onreadystatechange = function () {
                             if (objXmlHttp.readyState === XMLHttpRequest.DONE) {
                                 console.log(objXmlHttp.responseText)
                             }
                         };
-                        let strParams = 'uuid='+node.dataset.uuid+'&title='+strTitle+'&language=<?= \Alnv\FrontendEditingBundle\Library\FileHelper::getCurrentLanguage() ?>';
+                        let strParams = 'uuid=' + node.dataset.uuid + '&title=' + strTitle + '&language=<?= FileHelper::getCurrentLanguage() ?>';
                         objXmlHttp.open('POST', 'dropzone/file/title', true);
                         objXmlHttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
                         objXmlHttp.send(strParams);
@@ -205,14 +222,14 @@
             }
 
             let blnSet = false;
-            let multiple = <?= ($this->multiple?'true':'false') ?>;
+            let multiple = <?= ($this->multiple ? 'true' : 'false') ?>;
             let values = objInput.value ? JSON.parse(objInput.value) : [];
 
             if (values.indexOf(uuid) > 0) {
                 return null;
             }
 
-            if (multiple && values.length<<?= $this->mSize ?>) {
+            if (multiple && values.length < <?= $this->mSize ?>) {
                 values.push(uuid);
                 blnSet = true;
             }
