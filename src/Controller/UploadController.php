@@ -22,21 +22,18 @@ class UploadController extends AbstractController
 
         $this->container->get('contao.framework')->initialize();
 
-        $arrResponse = [
-            'success' => false,
-            'error' => ''
-        ];
-
         $objField = FormFieldModel::findByPk($id);
 
         if (!$objField) {
-            $arrResponse['error'] = $GLOBALS['TL_LANG']['MSC']['uploadMessageTryAgain'];
-            return new JsonResponse($arrResponse);
+            \header("HTTP/1.0 400 Bad Request");
+            echo ($GLOBALS['TL_LANG']['MSC']['uploadMessageTryAgain'] ?? '');
+            exit;
         }
 
         if ($objField->multiple && count($this->getUploadsParam()) >= (int)$objField->mSize) {
-            $arrResponse['error'] = $GLOBALS['TL_LANG']['MSC']['uploadLimit'];
-            return new JsonResponse($arrResponse);
+            \header("HTTP/1.0 400 Bad Request");
+            echo ($GLOBALS['TL_LANG']['MSC']['uploadLimit'] ?? '');
+            exit;
         }
 
         $arrAttribute = Widget::getAttributesFromDca([
@@ -45,23 +42,24 @@ class UploadController extends AbstractController
         ], $objField->name, null, $objField->name);
 
         $arrFileUploadClass = ['Contao\FormFileUpload', 'Contao\FormUpload'];
-
         foreach ($arrFileUploadClass as $strClass) {
             if (class_exists($strClass)) {
                 $objUpload = new $strClass($arrAttribute);
                 $objUpload->validate();
 
                 if ($objUpload->hasErrors()) {
-                    $arrResponse['error'] = $objUpload->getErrorAsString() ?: $GLOBALS['TL_LANG']['MSC']['uploadGeneralError'];
+                    \header("HTTP/1.0 400 Bad Request");
+                    echo ($objUpload->getErrorAsString() ?: $GLOBALS['TL_LANG']['MSC']['uploadGeneralError']);
+                    exit;
                 } else {
                     $this->clearUploads($objField);
-                    $arrResponse['success'] = true;
-                    $arrResponse['file'] = $this->getUpload($objField->name);
                 }
             }
         }
 
-        return new JsonResponse($arrResponse);
+        return new JsonResponse([
+            'file' => $this->getUpload($objField->name)
+        ]);
     }
 
     #[Route(path: '/file/title', methods: ["POST"])]

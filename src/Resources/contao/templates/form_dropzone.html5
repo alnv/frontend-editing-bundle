@@ -3,8 +3,7 @@
 <?php if ($this->label): ?>
     <label for="ctrl_<?= $this->id ?>"<?php if ($this->class): ?> class="<?= $this->class ?>"<?php endif; ?>>
         <?php if ($this->mandatory): ?>
-            <span class="invisible"><?= $this->mandatoryField ?> </span><?= $this->label ?><span
-                    class="mandatory">*</span>
+            <span class="invisible"><?= $this->mandatoryField ?> </span><?= $this->label ?><span class="mandatory">*</span>
         <?php else: ?>
             <?= $this->label ?>
         <?php endif; ?>
@@ -22,12 +21,13 @@ use Contao\StringUtil;
 use Alnv\FrontendEditingBundle\Library\FileHelper;
 use Alnv\FrontendEditingBundle\Library\Helpers;
 
+
 $arrFiles = Helpers::getDropzoneValue($this->value);
 $objCombiner = new Combiner();
 $objCombiner->add('bundles/alnvfrontendediting/dropzone/basic.min.css');
-$objCombiner->add('bundles/alnvfrontendediting/dropzone/dropzone.min.css');
 $GLOBALS['TL_CSS']['cssDropzone'] = $objCombiner->getCombinedFile();
 $GLOBALS['TL_HEAD']['jDropzone'] = '<script src="/bundles/alnvfrontendediting/dropzone/dropzone.min.js"></script>';
+
 ?>
 <div class="dropzone-files">
     <?php if (!empty($arrFiles)): ?>
@@ -49,7 +49,7 @@ $GLOBALS['TL_HEAD']['jDropzone'] = '<script src="/bundles/alnvfrontendediting/dr
                         <?php $arrMeta = FileHelper::getMeta($objFileModel->meta, $objFile); ?>
                         <td>
                             <div class="ce_download block">
-                                <?php if (in_array($objFileModel->extension, ['png', 'jpeg', 'jpg'])): ?>
+                                <?php if (in_array($objFileModel->extension, ['png', 'jpeg', 'jpg', 'webp', 'svg'])): ?>
                                     <figure>
                                         <img src="<?= $objFileModel->path ?>" alt="" style="max-height:75px">
                                     </figure>
@@ -80,13 +80,12 @@ $GLOBALS['TL_HEAD']['jDropzone'] = '<script src="/bundles/alnvfrontendediting/dr
 </div>
 <div class="dropzone-field">
     <input type="hidden" value="" name="<?= $this->name ?>" id="id_input_<?= $this->id ?>">
-    <div id="id_dropzone_<?= $this->id ?>" class="dropzone">
+    <div id="id_dropzone_<?= $this->id ?>" class="dropzone-input-field">
         <div class="dz-message"><?= $GLOBALS["TL_LANG"]["MSC"]["dropzoneDzMessage"] ?></div>
     </div>
-    <p id="id_error_<?= $this->id ?>"
-       class="<?= ($this->hasErrors() ? 'error' : '') ?>"><?= ($this->hasErrors() ? $this->getErrorAsString() : '') ?></p>
+    <p id="id_error_<?= $this->id ?>" class="<?= ($this->hasErrors() ? 'error' : '') ?>"><?= ($this->hasErrors() ? $this->getErrorAsString() : '') ?></p>
 </div>
-<script async defer>
+<script>
     (function () {
 
         Dropzone.autoDiscover = false;
@@ -116,28 +115,25 @@ $GLOBALS['TL_HEAD']['jDropzone'] = '<script src="/bundles/alnvfrontendediting/dr
                 timeout: 0,
                 addRemoveLinks: true,
                 params: {
-                    uploads: <?= (empty($arrFiles) ? '[]' : json_encode($arrFiles, 512)) ?>
+                    uploads: <?= (empty($arrFiles) ? '[]' : \json_encode($arrFiles, null, 512)) ?>
                 }
             };
 
             let objDropzone = new Dropzone(document.getElementById('id_dropzone_<?= $this->id ?>'), objDropzoneOptions);
+
             objDropzone.on('complete', function (file) {
                 setError('');
                 if (!file.xhr) {
                     return null;
                 }
                 let objResponse = JSON.parse(file.xhr.response);
-                if (!objResponse.success) {
-                    setError((objResponse.error ? objResponse.error : objResponse.message))
-                } else {
-                    if (objResponse.file.uuid) {
-                        try {
-                            setUpload(objResponse.file.uuid);
-                        } catch (error) {
-                            clearUpload();
-                            objDropzone.removeFile(file);
-                            setError('<?= $GLOBALS['TL_LANG']['MSC']['uploadMessageTryAgain'] ?>');
-                        }
+                if (objResponse.file.uuid) {
+                    try {
+                        setUpload(objResponse.file.uuid);
+                    } catch (error) {
+                        clearUpload();
+                        objDropzone.removeFile(file);
+                        setError('<?= $GLOBALS['TL_LANG']['MSC']['uploadMessageTryAgain'] ?>');
                     }
                 }
             });

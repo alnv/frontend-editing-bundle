@@ -15,7 +15,7 @@ use Contao\Database;
 class Form extends System
 {
 
-    public function getRawFormFieldsByFormId($strFormId)
+    public function getRawFormFieldsByFormId($strFormId): array
     {
 
         Controller::loadDataContainer('tl_form_field');
@@ -63,7 +63,9 @@ class Form extends System
             $intMaxRow = \count($arrFields);
 
             foreach ($arrFields as $strField => $objField) {
+
                 $strClass = $GLOBALS['TL_FFL'][$objField->type] ?: null;
+
                 if (!class_exists($strClass)) {
                     continue;
                 }
@@ -71,6 +73,7 @@ class Form extends System
                 $arrData = $objField->row();
                 $arrData['decodeEntities'] = true;
                 $arrData['rowClass'] = 'row_' . $intRow . (($intRow == 0) ? ' row_first' : (($intRow == ($intMaxRow - 1)) ? ' row_last' : '')) . ((($intRow % 2) == 0) ? ' even' : ' odd');
+
                 if ($objField->type == 'password') {
                     ++$intRow;
                     ++$intMaxRow;
