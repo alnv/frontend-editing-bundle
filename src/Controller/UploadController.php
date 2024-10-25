@@ -3,6 +3,7 @@
 namespace Alnv\FrontendEditingBundle\Controller;
 
 use Contao\CoreBundle\Controller\AbstractController;
+use Contao\System;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -82,23 +83,26 @@ class UploadController extends AbstractController
     {
 
         $objFile = \FilesModel::findByUuid($uuid);
+        $strRootDir = System::getContainer()->getParameter('kernel.project_dir');
+
         if ($objFile) {
-            unlink(TL_ROOT . '/' . $objFile->path);
+            unlink($strRootDir . '/' . $objFile->path);
             $objFile->delete();
         }
 
         return new JsonResponse([]);
     }
 
-    protected function clearUploads($objField)
+    protected function clearUploads($objField): void
     {
 
+        $strRootDir = System::getContainer()->getParameter('kernel.project_dir');
         $varUploads = $this->getUploadsParam();
         if (!$objField->multiple && !empty($varUploads)) {
             foreach ($varUploads as $strUuid) {
                 $objFile = \FilesModel::findByUuid($strUuid);
                 if ($objFile) {
-                    unlink(TL_ROOT . '/' . $objFile->path);
+                    unlink($strRootDir . '/' . $objFile->path);
                     $objFile->delete();
                 }
             }
@@ -112,7 +116,7 @@ class UploadController extends AbstractController
         if (!is_array($varUploads) && !empty($varUploads)) {
             $varUploads = [$varUploads];
         }
-        return ($varUploads ? $varUploads : []);
+        return ($varUploads ?: []);
     }
 
     protected function getUpload($strName)
