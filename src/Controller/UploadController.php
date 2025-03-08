@@ -5,6 +5,7 @@ namespace Alnv\FrontendEditingBundle\Controller;
 use Contao\CoreBundle\Controller\AbstractController;
 use Contao\System;
 use Contao\Widget;
+use Contao\FormUpload;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use Contao\Input;
@@ -41,24 +42,19 @@ class UploadController extends AbstractController
             'eval' => $objField->row(),
         ], $objField->name, null, $objField->name);
 
-        $arrFileUploadClass = ['Contao\FormFileUpload', 'Contao\FormUpload'];
-        foreach ($arrFileUploadClass as $strClass) {
-            if (class_exists($strClass)) {
-                $objUpload = new $strClass($arrAttribute);
-                $objUpload->validate();
+        $objUpload = new FormUpload($arrAttribute);
+        $objUpload->validate();
 
-                if ($objUpload->hasErrors()) {
-                    \header("HTTP/1.0 400 Bad Request");
-                    echo ($objUpload->getErrorAsString() ?: $GLOBALS['TL_LANG']['MSC']['uploadGeneralError']);
-                    exit;
-                } else {
-                    $this->clearUploads($objField);
-                }
-            }
+        if ($objUpload->hasErrors()) {
+            \header("HTTP/1.0 400 Bad Request");
+            echo ($objUpload->getErrorAsString() ?: $GLOBALS['TL_LANG']['MSC']['uploadGeneralError']);
+            exit;
+        } else {
+            $this->clearUploads($objField);
         }
 
         return new JsonResponse([
-            'file' => $this->getUpload($objField->name)
+            'file' => $objUpload->value
         ]);
     }
 
@@ -123,7 +119,7 @@ class UploadController extends AbstractController
     {
 
         $varUploads = Input::post('uploads');
-        if (!is_array($varUploads) && !empty($varUploads)) {
+        if (!\is_array($varUploads) && !empty($varUploads)) {
             $varUploads = [$varUploads];
         }
 

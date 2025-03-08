@@ -1,7 +1,7 @@
 <?php
 
 use Contao\DC_Table;
-# use NotificationCenter\Model\Notification;
+use Contao\System;
 
 $GLOBALS['TL_DCA']['tl_states'] = [
     'config' => [
@@ -71,15 +71,19 @@ $GLOBALS['TL_DCA']['tl_states'] = [
                 'includeBlankOption' => true
             ],
             'options_callback' => function () {
+
                 $arrReturn = [];
-                /*
-                $objNotificationCollection = \NotificationCenter\Model\Notification::findByType('feState');
-                if (null !== $objNotificationCollection) {
-                    while ($objNotificationCollection->next()) {
-                        $arrReturn[$objNotificationCollection->id] = $objNotificationCollection->title;
-                    }
+                $objNotificationCenter = System::getContainer()->get('frontendediting.services.notification_center');
+                $arrNotifications = $objNotificationCenter->getNotificationsForNotificationType('feState');
+
+                if (empty($arrNotifications)) {
+                    return $arrReturn;
                 }
-                */
+
+                foreach ($arrNotifications as $strId => $strLabel) {
+                    $arrReturn[$strId] = $strLabel;
+                }
+
                 return $arrReturn;
             },
             'sql' => ['type' => 'integer','notnull' => false,'unsigned' => true,'default' => 0]

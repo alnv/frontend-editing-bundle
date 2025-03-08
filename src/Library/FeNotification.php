@@ -10,7 +10,7 @@ use Contao\FrontendUser;
 use Contao\MemberModel;
 use Contao\StringUtil;
 use Contao\Validator;
-# use NotificationCenter\Model\Notification;
+use Contao\System;
 
 class FeNotification
 {
@@ -28,11 +28,9 @@ class FeNotification
 
         $this->setFormTokens($strEntityId, $arrTokens);
         $this->setMemberTokens($arrTokens);
-        /*
-        if ($objNotification = Notification::findByPk($strNotificationId)) {
-            $objNotification->send($arrTokens);
-        }
-        */
+
+        $objNotificationCenter = System::getContainer()->get('frontendediting.services.notification_center');
+        $objNotificationCenter->send($strNotificationId, $arrTokens);
     }
 
     protected function setFormTokens($strEntityId, &$arrTokens): void
