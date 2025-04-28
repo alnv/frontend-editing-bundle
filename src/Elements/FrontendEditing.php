@@ -311,7 +311,7 @@ class FrontendEditing extends ContentElement
 
         if (Input::post('changeNsave') !== null) {
             $this->strSubmitType = 'changeNsave';
-            $this->arrSettings['status'] = Input::post('changeNsave');
+            // $this->arrSettings['status'] = Input::post('changeNsave');
         }
 
         foreach ($this->arrSettings['submitButtons'] as $strId => $strLabel) {
