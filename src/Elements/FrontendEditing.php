@@ -155,7 +155,7 @@ class FrontendEditing extends ContentElement
             $arrEntity = (new Form())->getEntityByAlias($this->strAlias);
             if (!empty($arrEntity)) {
                 $objGroup = Database::getInstance()->prepare('SELECT * FROM tl_entity_group WHERE id=?')->limit(1)->execute($arrEntity['pid']);
-                return $objGroup->form;
+                return $objGroup->form ?: '';
             }
         }
 
@@ -311,7 +311,7 @@ class FrontendEditing extends ContentElement
 
         if (Input::post('changeNsave') !== null) {
             $this->strSubmitType = 'changeNsave';
-            $this->arrSettings['status'] = Input::post('changeNsave');
+            // $this->arrSettings['status'] = Input::post('changeNsave');
         }
 
         foreach ($this->arrSettings['submitButtons'] as $strId => $strLabel) {

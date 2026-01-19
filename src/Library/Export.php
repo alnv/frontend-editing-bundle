@@ -124,7 +124,7 @@ class Export extends System
         $numRows = 2;
         foreach ($arrRows as $arrSet) {
             $numCols = 1;
-            foreach ($arrSet as $strField => $strValue) {
+            foreach ($arrSet as $strValue) {
                 $objSheet->setCellValue([$numCols, $numRows], $strValue);
                 $numCols++;
             }

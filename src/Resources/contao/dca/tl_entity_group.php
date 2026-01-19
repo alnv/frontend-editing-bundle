@@ -52,7 +52,7 @@ $GLOBALS['TL_DCA']['tl_entity_group'] = [
             'delete' => [
                 'href' => 'act=delete',
                 'icon' => 'delete.svg',
-                'attributes' => 'onclick="if(!confirm(\'' . ($GLOBALS['TL_LANG']['MSC']['deleteConfirm']??'') . '\'))return false;Backend.getScrollOffset()"'
+                'attributes' => 'onclick="if(!confirm(\'' . ($GLOBALS['TL_LANG']['MSC']['deleteConfirm'] ?? '') . '\'))return false;Backend.getScrollOffset()"'
             ],
             'show' => [
                 'href' => 'act=show',
@@ -62,11 +62,11 @@ $GLOBALS['TL_DCA']['tl_entity_group'] = [
     ],
     'fields' => [
         'id' => [
-            'sql' => ['type'=>'integer','autoincrement'=>true,'notnull'=>true,'unsigned'=>true]
+            'sql' => ['type' => 'integer', 'autoincrement' => true, 'notnull' => true, 'unsigned' => true]
         ],
         'tstamp' => [
             'flag' => 6,
-            'sql' => ['type'=>'integer','notnull'=>false,'unsigned'=>true,'default' => 0]
+            'sql' => ['type' => 'integer', 'notnull' => false, 'unsigned' => true, 'default' => 0]
         ],
         'form' => [
             'relation' => [
@@ -74,7 +74,7 @@ $GLOBALS['TL_DCA']['tl_entity_group'] = [
                 'load' => 'lazy'
             ],
             'foreignKey' => 'tl_form.title',
-            'sql' => ['type'=>'integer','notnull'=>false,'unsigned'=>true,'default' => 0]
+            'sql' => ['type' => 'integer', 'notnull' => false, 'unsigned' => true, 'default' => 0]
         ]
     ]
 ];

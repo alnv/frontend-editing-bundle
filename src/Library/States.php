@@ -15,17 +15,24 @@ class States extends Controller
         parent::__construct();
     }
 
-    public function changeState($strEntityId, $strStateId)
+    public function changeState($strEntityId, $strStateId): void
     {
 
         if (!$strStateId) {
-            return null;
+
+            if (isset($GLOBALS['TL_HOOKS']['saveWithoutStateChange']) && is_array($GLOBALS['TL_HOOKS']['saveWithoutStateChange'])) {
+                foreach ($GLOBALS['TL_HOOKS']['saveWithoutStateChange'] as $arrCallback) {
+                    System::importStatic($arrCallback[0])->{$arrCallback[1]}($strEntityId, $strStateId, $this);
+                }
+            }
+
+            return;
         }
 
         $objState = Database::getInstance()->prepare('SELECT * FROM tl_states WHERE id=?')->limit(1)->execute($strStateId);
 
         if (!$objState->numRows) {
-            return null;
+            return;
         }
 
         (new FeNotification())->send($objState->notification, $strEntityId);

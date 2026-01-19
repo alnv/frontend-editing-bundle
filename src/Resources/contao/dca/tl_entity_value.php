@@ -1,16 +1,17 @@
 <?php
 
-use Contao\DC_Table;
-use Contao\StringUtil;
-use Contao\FormFieldModel;
+use Alnv\FrontendEditingBundle\DataContainer\EntityValue;
 use Alnv\FrontendEditingBundle\Library\Helpers;
+use Contao\DC_Table;
+use Contao\FormFieldModel;
+use Contao\StringUtil;
 
 $GLOBALS['TL_DCA']['tl_entity_value'] = [
     'config' => [
         'closed' => true,
         'dataContainer' => DC_Table::class,
         'ptable' => 'tl_entity',
-        'onload_callback' => [['Alnv\FrontendEditingBundle\DataContainer\EntityValue', 'getVarValueWidget']],
+        'onload_callback' => [[EntityValue::class, 'getVarValueWidget']],
         'sql' => [
             'keys' => [
                 'id' => 'primary'
@@ -59,7 +60,7 @@ $GLOBALS['TL_DCA']['tl_entity_value'] = [
             'delete' => [
                 'href' => 'act=delete',
                 'icon' => 'delete.svg',
-                'attributes' => 'onclick="if(!confirm(\'' . ($GLOBALS['TL_LANG']['MSC']['deleteConfirm']??'') . '\'))return false;Backend.getScrollOffset()"'
+                'attributes' => 'onclick="if(!confirm(\'' . ($GLOBALS['TL_LANG']['MSC']['deleteConfirm'] ?? '') . '\'))return false;Backend.getScrollOffset()"'
             ],
             'show' => [
                 'href' => 'act=show',
@@ -72,14 +73,14 @@ $GLOBALS['TL_DCA']['tl_entity_value'] = [
     ],
     'fields' => [
         'id' => [
-            'sql' => ['type'=>'integer','autoincrement' => true,'notnull' => true,'unsigned' => true]
+            'sql' => ['type' => 'integer', 'autoincrement' => true, 'notnull' => true, 'unsigned' => true]
         ],
         'tstamp' => [
             'flag' => 6,
-            'sql' => ['type'=>'integer','notnull' => false,'unsigned' => true,'default' => 0]
+            'sql' => ['type' => 'integer', 'notnull' => false, 'unsigned' => true, 'default' => 0]
         ],
         'pid' => [
-            'sql' => ['type' => 'integer','notnull' => false,'unsigned' => true,'default' => 0]
+            'sql' => ['type' => 'integer', 'notnull' => false, 'unsigned' => true, 'default' => 0]
         ],
         'field' => [
             'relation' => [
@@ -88,7 +89,7 @@ $GLOBALS['TL_DCA']['tl_entity_value'] = [
             ],
             'filter' => true,
             'foreignKey' => 'tl_form_field.CONCAT(label, " - ", name)',
-            'sql' => ['type' => 'integer','notnull' => false,'unsigned' => true,'default' => 0]
+            'sql' => ['type' => 'integer', 'notnull' => false, 'unsigned' => true, 'default' => 0]
         ],
         'varValue' => [
             'search' => true,

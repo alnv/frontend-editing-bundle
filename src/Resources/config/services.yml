@@ -2,8 +2,19 @@ services:
   _defaults:
     autowire: true
     autoconfigure: true
+  frontendediting.services.notification_center:
+    class: Alnv\FrontendEditingBundle\Services\NotificationCenter
+    public: true
+    arguments:
+      - '@Terminal42\NotificationCenterBundle\NotificationCenter'
   Alnv\FrontendEditingBundle\Controller\UploadController:
     public: true
+  Alnv\FrontendEditingBundle\NotificationCenter\FeChange:
+    tags:
+      notification_center: notification_type
+  Alnv\FrontendEditingBundle\NotificationCenter\FeState:
+    tags:
+      notification_center: notification_type
   frontendediting.inserttags.ignoretags:
     class: Alnv\FrontendEditingBundle\Inserttags\IgnoreTags
     public: true

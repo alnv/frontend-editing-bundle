@@ -1,14 +1,14 @@
 <?php
 
-use Contao\Input;
-use Contao\DC_Table;
-use Contao\StringUtil;
+use Alnv\FrontendEditingBundle\Library\Export;
+use Alnv\FrontendEditingBundle\Library\Helpers;
+use Alnv\FrontendEditingBundle\Library\States;
+use Alnv\FrontendEditingBundle\Library\Tablelist;
 use Contao\Controller;
 use Contao\DataContainer;
-use Alnv\FrontendEditingBundle\Library\Helpers;
-use Alnv\FrontendEditingBundle\Library\Export;
-use Alnv\FrontendEditingBundle\Library\Tablelist;
-use Alnv\FrontendEditingBundle\Library\States;
+use Contao\DC_Table;
+use Contao\Input;
+use Contao\StringUtil;
 
 $GLOBALS['TL_DCA']['tl_entity'] = [
     'config' => [
@@ -16,12 +16,12 @@ $GLOBALS['TL_DCA']['tl_entity'] = [
         'dataContainer' => DC_Table::class,
         'ptable' => 'tl_entity_group',
         'ctable' => ['tl_entity_value'],
-        'onload_callback' => [function() {
+        'onload_callback' => [function () {
             if (!Input::get('export')) {
                 return null;
             }
             (new Export())->download(Input::get('id'));
-            Controller::redirect(preg_replace('/&(amp;)?export=[^&]*/i', '', preg_replace( '/&(amp;)?' . preg_quote(\Input::get('export'), '/') . '=[^&]*/i', '', \Environment::get('request'))));
+            Controller::redirect(preg_replace('/&(amp;)?export=[^&]*/i', '', preg_replace('/&(amp;)?' . preg_quote(\Input::get('export'), '/') . '=[^&]*/i', '', \Environment::get('request'))));
         }],
         'sql' => [
             'keys' => [
@@ -35,14 +35,14 @@ $GLOBALS['TL_DCA']['tl_entity'] = [
             'fields' => ['sorting'],
             'headerFields' => ['form'],
             'panelLayout' => 'filter;search,limit',
-            'child_record_callback'  => function ($arrRow) {
+            'child_record_callback' => function ($arrRow) {
                 $strTemplate = '';
                 foreach ((new Tablelist())->getValues($arrRow['id']) as $arrField) {
                     $strValue = StringUtil::deserialize($arrField['value']);
                     if (is_array($strValue)) {
                         $strValue = Helpers::makeArrayReadable($strValue);
                     }
-                    $strTemplate .= ($arrField['label']?:$arrField['name']) .': ' . $strValue . '</br>';
+                    $strTemplate .= ($arrField['label'] ?: $arrField['name']) . ': ' . $strValue . '</br>';
                 }
                 return $strTemplate;
             }
@@ -59,7 +59,7 @@ $GLOBALS['TL_DCA']['tl_entity'] = [
             'delete' => [
                 'href' => 'act=delete',
                 'icon' => 'delete.svg',
-                'attributes' => 'onclick="if(!confirm(\'' . ($GLOBALS['TL_LANG']['MSC']['deleteConfirm']??'') . '\'))return false;Backend.getScrollOffset()"'
+                'attributes' => 'onclick="if(!confirm(\'' . ($GLOBALS['TL_LANG']['MSC']['deleteConfirm'] ?? '') . '\'))return false;Backend.getScrollOffset()"'
             ],
             'show' => [
                 'href' => 'act=show',
@@ -80,24 +80,24 @@ $GLOBALS['TL_DCA']['tl_entity'] = [
     ],
     'fields' => [
         'id' => [
-            'sql' => ['type'=>'integer','autoincrement'=>true,'notnull'=>true,'unsigned'=>true]
+            'sql' => ['type' => 'integer', 'autoincrement' => true, 'notnull' => true, 'unsigned' => true]
         ],
         'alias' => [
-            'sql' => ['type'=>'string', 'length' => 255, 'default' => '']
+            'sql' => ['type' => 'string', 'length' => 255, 'default' => '']
         ],
         'tstamp' => [
             'flag' => 6,
-            'sql' => ['type'=>'integer','notnull'=>false,'unsigned'=>true,'default' => 0]
+            'sql' => ['type' => 'integer', 'notnull' => false, 'unsigned' => true, 'default' => 0]
         ],
         'created_at' => [
             'flag' => 6,
-            'sql' => ['type'=>'integer','notnull'=>false,'unsigned'=>true,'default' => 0]
+            'sql' => ['type' => 'integer', 'notnull' => false, 'unsigned' => true, 'default' => 0]
         ],
         'pid' => [
-            'sql' => ['type' => 'integer','notnull' => false,'unsigned' => true,'default' => 0]
+            'sql' => ['type' => 'integer', 'notnull' => false, 'unsigned' => true, 'default' => 0]
         ],
         'sorting' => [
-            'sql' => ['type' => 'integer','notnull' => false,'unsigned' => true,'default' => 0]
+            'sql' => ['type' => 'integer', 'notnull' => false, 'unsigned' => true, 'default' => 0]
         ],
         'member' => [
             'inputType' => 'select',
@@ -113,7 +113,7 @@ $GLOBALS['TL_DCA']['tl_entity'] = [
                 'load' => 'lazy'
             ],
             'foreignKey' => 'tl_member.username',
-            'sql' => ['type' => 'integer','notnull' => false,'unsigned' => true]
+            'sql' => ['type' => 'integer', 'notnull' => false, 'unsigned' => true]
         ],
         'status' => [
             'inputType' => 'select',
